@@ -1,4 +1,4 @@
-package db_structs
+package db
 
 type Reservation struct {
 	id, table_id         int
