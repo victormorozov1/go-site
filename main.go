@@ -15,11 +15,15 @@ func main() {
 		panic(err)
 	}
 
-	defer db.Close()
-
-	user := database.User{1, "Victor", "Morozov", "Victorovich", "admin", "89228311", "kakaska@ya.ru", "-", nil}
+	user := database.User{4, "Victor223", "Morov", "Victorovich", "admin", "89228311", "kakaska@ya.ru", "-", nil}
 	err = user.SaveToDB(db)
 
+	if err != nil {
+		panic(err)
+	}
+
+	reservation := database.Reservation{4, 2, 3, 4, 5}
+	err = reservation.SaveToDB(db)
 	if err != nil {
 		panic(err)
 	}
