@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 	"strconv"
 )
 
@@ -22,27 +23,19 @@ func (reservation *Reservation) SaveToDB(db *sql.DB) error {
 	})
 }
 
-func GetReservationsByUserId(db *sql.DB, userId int) {
-	//result, err := db.Query("select * from users2")
-	//
-	//var all_users []*User
-	//
-	//if err != nil {
-	//	return err, all_users
-	//}
-	//
-	//for result.Next() {
-	//	var new_user = User{}
-	//
-	//	err := result.Scan(&new_user.Id, &new_user.Name, &new_user.Surname, &new_user.Patronymic,
-	//		&new_user.Role, &new_user.Phone, &new_user.Email, &new_user.Photo_src)
-	//
-	//	if err != nil {
-	//		return err, all_users
-	//	}
-	//
-	//	all_users = append(all_users, &new_user)
-	//}
-	//
-	//return nil, all_users
+func GetReservationsByUserId(db *sql.DB, userId int) ([]*Reservation, error) {
+	f := func(rows *sql.Rows) (*Reservation, error) {
+		var reservation = Reservation{}
+
+		err := rows.Scan(&reservation.Id, &reservation.User_id, &reservation.Table_id,
+			&reservation.Start_time, &reservation.End_time)
+
+		return &reservation, err
+	}
+	return getFromDB(db, "select * from "+reservationsTable+" where user_id="+strconv.Itoa(userId), f)
+}
+
+func (r Reservation) String() string {
+	return fmt.Sprintf("Reservation(id=%d user_id=%d table_id=%d start_time=%d end_time=%d",
+		r.Id, r.User_id, r.Table_id, r.Start_time, r.End_time)
 }

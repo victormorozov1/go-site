@@ -19,6 +19,18 @@ func printAllUsers(db *sql.DB) {
 	}
 }
 
+func printReservationsByUser(db *sql.DB, userId int) {
+	reservations, err := database.GetReservationsByUserId(db, 2)
+
+	if err != nil {
+		panic(err)
+	}
+
+	for _, r := range reservations {
+		println(r.String())
+	}
+}
+
 func main() {
 	//s := server.Server{"127.0.0.1", 8080}
 	//s.Start()
@@ -29,6 +41,6 @@ func main() {
 	}
 	defer db.Close()
 
-	printAllUsers(db)
+	printReservationsByUser(db, 2)
 
 }
