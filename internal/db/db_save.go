@@ -43,18 +43,41 @@ func Values(mp map[string]string) []string {
 	return keysValues(mp, false, true)["values"]
 }
 
-func SaveToDB(db *sql.DB, table_name string, data map[string]string) error {
+func SaveToDB(db *sql.DB, tableName string, data map[string]string) error {
 	keysValues := keysValues(data, true, true)
 	names := "(`" + Join("`, `", keysValues["keys"]) + "`)"
 	values := "('" + Join("', '", keysValues["values"]) + "'	)"
 
-	request := "INSERT INTO `" + table_name + "` " + names + " VALUES" + values
+	request := "INSERT INTO `" + tableName + "` " + names + " VALUES" + values
 	println(request)
 
 	insert, err := db.Query(request) // add reservations
 	if err != nil {
 		return err
 	}
-	defer insert.Close()
-	return nil
+	return insert.Close()
 }
+
+//func GetFromDB(db *sql.DB, tableName string, columns, []string) ([]interface{}, error) {
+//	values := make([]interface{}, len(columns))
+//
+//	names := "`" + Join("`, `", columns) + "`"
+//	request := "SELECT " + names + " FROM " + tableName
+//	println(request)
+//	result, err := db.Query(request)
+//	if err != nil {
+//		return values, err
+//	}
+//	defer result.Close()
+//
+//	for result.Next() {
+//		err := result.Scan(&p.id, &p.model, &p.company, &p.price)
+//		if err != nil {
+//			fmt.Println(err)
+//			continue
+//		}
+//		products = append(products, p)
+//	}
+//
+//	return values, err
+//}

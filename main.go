@@ -6,6 +6,19 @@ import (
 	database "internal/db"
 )
 
+func printAllUsers(db *sql.DB) {
+	println("All users:")
+	err, allUsers := database.GetUsers(db)
+
+	if err != nil {
+		panic(err)
+	}
+
+	for _, user := range allUsers {
+		println(user.String())
+	}
+}
+
 func main() {
 	//s := server.Server{"127.0.0.1", 8080}
 	//s.Start()
@@ -14,20 +27,8 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	defer db.Close()
 
-	user := database.User{4, "Victor223", "Morov", "Victorovich", "admin", "89228311", "kakaska@ya.ru", "-", nil}
-	err = user.SaveToDB(db)
-
-	if err != nil {
-		panic(err)
-	}
-
-	reservation := database.Reservation{4, 2, 3, 4, 5}
-	err = reservation.SaveToDB(db)
-	if err != nil {
-		panic(err)
-	}
-
-	//print(database.GetUsers(db))
+	printAllUsers(db)
 
 }
