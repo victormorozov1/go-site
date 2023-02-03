@@ -8,7 +8,7 @@ import (
 
 func printAllUsers(db *sql.DB) {
 	println("All users:")
-	err, allUsers := database.GetUsers(db)
+	allUsers, err := database.GetUsers(db)
 
 	if err != nil {
 		panic(err)

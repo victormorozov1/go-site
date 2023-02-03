@@ -18,29 +18,16 @@ type User struct {
 	Photo_src                 string
 }
 
-func GetUsers(db *sql.DB) (error, []*User) {
-	result, err := db.Query("select * from users2")
-
-	var all_users []*User
-
-	if err != nil {
-		return err, all_users
-	}
-
-	for result.Next() {
+func GetUsers(db *sql.DB) ([]*User, error) {
+	f := func(rows *sql.Rows) (*User, error) {
 		var new_user = User{}
 
-		err := result.Scan(&new_user.Id, &new_user.Name, &new_user.Surname, &new_user.Patronymic,
+		err := rows.Scan(&new_user.Id, &new_user.Name, &new_user.Surname, &new_user.Patronymic,
 			&new_user.Role, &new_user.Phone, &new_user.Email, &new_user.Photo_src)
 
-		if err != nil {
-			return err, all_users
-		}
-
-		all_users = append(all_users, &new_user)
+		return &new_user, err
 	}
-
-	return nil, all_users
+	return getFromDB(db, "select * from "+usersTable, f)
 }
 
 func (user *User) SaveToDB(db *sql.DB) error {
