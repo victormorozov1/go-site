@@ -16,16 +16,29 @@ type User struct {
 	Role                      string
 	Phone, Email              string
 	Photo_src                 string
+	Reservations              []*Reservation
 }
 
 func GetUsers(db *sql.DB) ([]*User, error) {
 	f := func(rows *sql.Rows) (*User, error) {
-		var new_user = User{}
+		var newUser = User{}
 
-		err := rows.Scan(&new_user.Id, &new_user.Name, &new_user.Surname, &new_user.Patronymic,
-			&new_user.Role, &new_user.Phone, &new_user.Email, &new_user.Photo_src)
+		err := rows.Scan(&newUser.Id, &newUser.Name, &newUser.Surname, &newUser.Patronymic,
+			&newUser.Role, &newUser.Phone, &newUser.Email, &newUser.Photo_src)
 
-		return &new_user, err
+		if err != nil {
+			return nil, err
+		}
+
+		reservations, err := GetReservationsByUserId(db, newUser.Id)
+
+		if err != nil {
+			return &newUser, err
+		}
+
+		newUser.Reservations = reservations
+
+		return &newUser, nil
 	}
 	return getFromDB(db, "select * from "+usersTable, f)
 }
@@ -44,6 +57,6 @@ func (user *User) SaveToDB(db *sql.DB) error {
 }
 
 func (user *User) String() string {
-	return fmt.Sprintf("User(id=%d name=%v surname=%v patronymic=%v role=%v phone=%v email=%v photo_src=%v",
-		user.Id, user.Name, user.Surname, user.Patronymic, user.Role, user.Phone, user.Email, user.Photo_src)
+	return fmt.Sprintf("User(id=%d name=%v surname=%v patronymic=%v role=%v phone=%v email=%v photo_src=%v %d reservations",
+		user.Id, user.Name, user.Surname, user.Patronymic, user.Role, user.Phone, user.Email, user.Photo_src, len(user.Reservations))
 }

@@ -41,6 +41,6 @@ func main() {
 	}
 	defer db.Close()
 
-	printReservationsByUser(db, 2)
+	printAllUsers(db)
 
 }
