@@ -16,7 +16,7 @@ func Join(sep string, arr []string) string {
 	return s
 }
 
-func keysValues[keyType constraints.Ordered, valueType interface{}](mp map[keyType]valueType, keys, values bool) ([]keyType, []valueType) {
+func KeysValues[keyType constraints.Ordered, valueType interface{}](mp map[keyType]valueType, keys, values bool) ([]keyType, []valueType) {
 	keysSlice := make([]keyType, len(mp))
 	valuesSlice := make([]valueType, len(mp))
 	i := 0
@@ -33,17 +33,17 @@ func keysValues[keyType constraints.Ordered, valueType interface{}](mp map[keyTy
 }
 
 func Keys[keyType constraints.Ordered, valueType interface{}](mp map[keyType]valueType) []keyType {
-	keys, _ := keysValues(mp, true, false)
+	keys, _ := KeysValues(mp, true, false)
 	return keys
 }
 
 func Values(mp map[string]string) []string {
-	_, values := keysValues(mp, false, true)
+	_, values := KeysValues(mp, false, true)
 	return values
 }
 
 func SaveToDB(db *sql.DB, tableName string, data map[string]string) error {
-	keys, values := keysValues(data, true, true)
+	keys, values := KeysValues(data, true, true)
 	columns := "(`" + Join("`, `", keys) + "`)"
 	columnsValues := "('" + Join("', '", values) + "'	)"
 

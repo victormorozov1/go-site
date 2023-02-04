@@ -41,7 +41,7 @@ func main() {
 	}
 	defer db.Close()
 
-	u := database.User{7, "Vova", "shelly", "sergeevich", "Brawler",
+	u := database.User{8, "Shelly", "slava", "tadzicistanu", "Brawler",
 		"89124883837", "AMERICA@SOSYET.PUTINTOP228.ru", "/jkdfhjk", nil}
 	u.SaveToDB(db)
 	printAllUsers(db)
