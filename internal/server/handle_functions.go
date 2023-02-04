@@ -32,6 +32,7 @@ func (server *Server) allUsersPage(w http.ResponseWriter, r *http.Request) {
 
 	type templateData struct {
 		UsersNum int
+		UsersArr []*database.User
 	}
-	t.Execute(w, &templateData{len(allUsers)})
+	t.Execute(w, &templateData{len(allUsers), allUsers}) // Тут нельзя возвращать пароли
 }

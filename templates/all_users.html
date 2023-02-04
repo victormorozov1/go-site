@@ -5,6 +5,9 @@
     <title>AllUsers</title>
 </head>
 <body>
-    В системе зарегестрировано: {{ .UsersNum }}
+    <p>В системе зарегестрировано: {{ .UsersNum }}</p>
+    {{ range .UsersArr }}
+        <p>{{ .Name }}</p>
+    {{ end }}
 </body>
 </html>
