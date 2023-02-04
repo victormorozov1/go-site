@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"golang.org/x/exp/constraints"
 )
 
 func Join(sep string, arr []string) string {
@@ -15,9 +16,9 @@ func Join(sep string, arr []string) string {
 	return s
 }
 
-func keysValues(mp map[string]string, keys, values bool) map[string][]string {
-	keysSlice := make([]string, len(mp))
-	valuesSlice := make([]string, len(mp))
+func keysValues[keyType constraints.Ordered, valueType interface{}](mp map[keyType]valueType, keys, values bool) ([]keyType, []valueType) {
+	keysSlice := make([]keyType, len(mp))
+	valuesSlice := make([]valueType, len(mp))
 	i := 0
 	for key, value := range mp {
 		if keys {
@@ -28,27 +29,25 @@ func keysValues(mp map[string]string, keys, values bool) map[string][]string {
 		}
 		i++
 	}
-	return map[string][]string{
-		"keys":   keysSlice,
-		"values": valuesSlice,
-	}
+	return keysSlice, valuesSlice
 }
 
-// func Keys[keyType constraints.Ordered](mp map[keyType]interface{}) []keyType {
-func Keys(mp map[string]string) []string {
-	return keysValues(mp, true, false)["keys"]
+func Keys[keyType constraints.Ordered, valueType interface{}](mp map[keyType]valueType) []keyType {
+	keys, _ := keysValues(mp, true, false)
+	return keys
 }
 
 func Values(mp map[string]string) []string {
-	return keysValues(mp, false, true)["values"]
+	_, values := keysValues(mp, false, true)
+	return values
 }
 
 func SaveToDB(db *sql.DB, tableName string, data map[string]string) error {
-	keysValues := keysValues(data, true, true)
-	names := "(`" + Join("`, `", keysValues["keys"]) + "`)"
-	values := "('" + Join("', '", keysValues["values"]) + "'	)"
+	keys, values := keysValues(data, true, true)
+	columns := "(`" + Join("`, `", keys) + "`)"
+	columnsValues := "('" + Join("', '", values) + "'	)"
 
-	request := "INSERT INTO `" + tableName + "` " + names + " VALUES" + values
+	request := "INSERT INTO `" + tableName + "` " + columns + " VALUES" + columnsValues
 	println(request)
 
 	insert, err := db.Query(request) // add reservations
@@ -57,27 +56,3 @@ func SaveToDB(db *sql.DB, tableName string, data map[string]string) error {
 	}
 	return insert.Close()
 }
-
-//func GetFromDB(db *sql.DB, tableName string, columns, []string) ([]interface{}, error) {
-//	values := make([]interface{}, len(columns))
-//
-//	names := "`" + Join("`, `", columns) + "`"
-//	request := "SELECT " + names + " FROM " + tableName
-//	println(request)
-//	result, err := db.Query(request)
-//	if err != nil {
-//		return values, err
-//	}
-//	defer result.Close()
-//
-//	for result.Next() {
-//		err := result.Scan(&p.id, &p.model, &p.company, &p.price)
-//		if err != nil {
-//			fmt.Println(err)
-//			continue
-//		}
-//		products = append(products, p)
-//	}
-//
-//	return values, err
-//}
