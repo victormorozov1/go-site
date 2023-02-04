@@ -24,7 +24,7 @@ func (server *Server) allUsersPage(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, err.Error())
 	}
 
-	allUsers, err := database.GetUsers(server.DataBase)
+	allUsers, err := database.GetUsers(server.DataBase, server.UsersTableName, server.ReservationsTableName)
 
 	if err != nil {
 		panic(err) // Тут нужно написать возвращение ошибки пользователю

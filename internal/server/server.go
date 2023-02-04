@@ -7,9 +7,10 @@ import (
 )
 
 type Server struct {
-	Host     string
-	Port     int
-	DataBase *sql.DB
+	Host                                  string
+	Port                                  int
+	DataBase                              *sql.DB
+	UsersTableName, ReservationsTableName string
 }
 
 func (server *Server) String() string {

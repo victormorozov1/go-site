@@ -6,10 +6,6 @@ import (
 	"strconv"
 )
 
-const (
-	usersTable = "users2"
-)
-
 type User struct {
 	Id                        int
 	Name, Surname, Patronymic string
@@ -19,7 +15,7 @@ type User struct {
 	Reservations              []*Reservation
 }
 
-func GetUsers(db *sql.DB) ([]*User, error) {
+func GetUsers(db *sql.DB, usersTableName, reservationsTableName string) ([]*User, error) {
 	f := func(rows *sql.Rows) (*User, error) {
 		var newUser = User{}
 
@@ -30,7 +26,7 @@ func GetUsers(db *sql.DB) ([]*User, error) {
 			return nil, err
 		}
 
-		reservations, err := GetReservationsByUserId(db, newUser.Id)
+		reservations, err := GetReservationsByUserId(db, reservationsTableName, newUser.Id)
 
 		if err != nil {
 			return &newUser, err
@@ -40,7 +36,7 @@ func GetUsers(db *sql.DB) ([]*User, error) {
 
 		return &newUser, nil
 	}
-	return getFromDB(db, "select * from "+usersTable, f)
+	return getFromDB(db, "select * from "+usersTableName, f)
 }
 
 func (user *User) SaveToDB(db *sql.DB) error {

@@ -9,7 +9,7 @@ import (
 
 func printAllUsers(db *sql.DB) {
 	println("All users:")
-	allUsers, err := database.GetUsers(db)
+	allUsers, err := database.GetUsers(db, "users2", "reservations2")
 
 	if err != nil {
 		panic(err)
@@ -21,7 +21,7 @@ func printAllUsers(db *sql.DB) {
 }
 
 func printReservationsByUser(db *sql.DB, userId int) {
-	reservations, err := database.GetReservationsByUserId(db, 2)
+	reservations, err := database.GetReservationsByUserId(db, "reservations2", 2)
 
 	if err != nil {
 		panic(err)
@@ -33,7 +33,7 @@ func printReservationsByUser(db *sql.DB, userId int) {
 }
 
 func main() {
-	s := server.Server{"127.0.0.1", 8080, nil}
+	s := server.Server{"127.0.0.1", 8080, nil, "users2", "reservations2"}
 	s.Start()
 	//db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")
 	//

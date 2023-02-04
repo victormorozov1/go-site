@@ -6,15 +6,13 @@ import (
 	"strconv"
 )
 
-const reservationsTable = "reservations2"
-
 type Reservation struct {
 	Id, Table_id, User_id int
 	Start_time, End_time  int // Потом сделать Time
 }
 
-func (reservation *Reservation) SaveToDB(db *sql.DB) error {
-	return SaveToDB(db, reservationsTable, map[string]string{
+func (reservation *Reservation) SaveToDB(db *sql.DB, reservationTableName string) error {
+	return SaveToDB(db, reservationTableName, map[string]string{
 		"id":         strconv.Itoa(reservation.Id),
 		"table_id":   strconv.Itoa(reservation.Table_id),
 		"user_id":    strconv.Itoa(reservation.User_id),
@@ -23,7 +21,7 @@ func (reservation *Reservation) SaveToDB(db *sql.DB) error {
 	})
 }
 
-func GetReservationsByUserId(db *sql.DB, userId int) ([]*Reservation, error) {
+func GetReservationsByUserId(db *sql.DB, reservationTableName string, userId int) ([]*Reservation, error) {
 	f := func(rows *sql.Rows) (*Reservation, error) {
 		var reservation = Reservation{}
 
@@ -32,7 +30,7 @@ func GetReservationsByUserId(db *sql.DB, userId int) ([]*Reservation, error) {
 
 		return &reservation, err
 	}
-	return getFromDB(db, "select * from "+reservationsTable+" where user_id="+strconv.Itoa(userId), f)
+	return getFromDB(db, "select * from "+reservationTableName+" where user_id="+strconv.Itoa(userId), f)
 }
 
 func (r Reservation) String() string {
