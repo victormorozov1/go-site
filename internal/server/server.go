@@ -1,13 +1,15 @@
 package server
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
 )
 
 type Server struct {
-	Host string
-	Port int
+	Host     string
+	Port     int
+	DataBase *sql.DB
 }
 
 func (server *Server) String() string {
@@ -26,10 +28,19 @@ func (server *Server) String() string {
 
 func (server *Server) handleFunc() {
 	http.HandleFunc("/", server.mainPage)
+	http.HandleFunc("/users", server.allUsersPage)
 }
 
 func (server *Server) Start() {
 	fmt.Print("Start ", server)
 	server.handleFunc()
+
+	var err error
+	server.DataBase, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")
+	if err != nil {
+		panic(err)
+	}
+	defer server.DataBase.Close()
+
 	http.ListenAndServe(fmt.Sprintf(":%d", server.Port), nil)
 }
