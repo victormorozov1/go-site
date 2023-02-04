@@ -3,12 +3,12 @@ module main
 go 1.19
 
 require internal/server v1.0.0
-
 require internal/db v1.0.0
+require internal/functions v1.0.0
 
 replace internal/server => ./internal/server
-
 replace internal/db => ./internal/db
+replace internal/functions => ./internal/functions
 
 require (
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
