@@ -30,6 +30,7 @@ func (server *Server) String() string {
 func (server *Server) handleFunc() {
 	http.HandleFunc("/", server.mainPage)
 	http.HandleFunc("/users", server.allUsersPage)
+	http.HandleFunc("/register", server.Register)
 }
 
 func (server *Server) Start() {

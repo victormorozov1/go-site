@@ -12,6 +12,7 @@ type User struct {
 	Role                      string
 	Phone, Email              string
 	Photo_src                 string
+	HashedPassword            string
 	Reservations              []*Reservation
 }
 
@@ -41,7 +42,7 @@ func GetUsers(db *sql.DB, usersTableName, reservationsTableName string) ([]*User
 
 func (user *User) SaveToDB(db *sql.DB) error {
 	return SaveToDB(db, "users2", map[string]string{
-		"id":         strconv.Itoa(user.Id),
+		"id":         strconv.Itoa(user.Id), //По идее если id=0 то его не нужно отправлять, но оно и так игнорируется почему-то
 		"name":       user.Name,
 		"surname":    user.Surname,
 		"patronymic": user.Patronymic,
