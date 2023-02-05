@@ -50,7 +50,7 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 				HashedPassword: Hash(password),
 			}
 			println(newUser.String())
-			err := newUser.SaveToDB(server.DataBase)
+			err := newUser.SaveToDB(server.DataBase, server.UsersTableName)
 			if err != nil {
 				println(err)
 				// Нужно вернуть ошибку

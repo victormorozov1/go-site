@@ -40,8 +40,8 @@ func GetUsers(db *sql.DB, usersTableName, reservationsTableName string) ([]*User
 	return getFromDB(db, "select * from "+usersTableName, f)
 }
 
-func (user *User) SaveToDB(db *sql.DB) error {
-	return SaveToDB(db, "users2", map[string]string{
+func (user *User) SaveToDB(db *sql.DB, usersTableName string) error {
+	return SaveToDB(db, usersTableName, map[string]string{
 		"id":         strconv.Itoa(user.Id), //По идее если id=0 то его не нужно отправлять, но оно и так игнорируется почему-то
 		"name":       user.Name,
 		"surname":    user.Surname,
