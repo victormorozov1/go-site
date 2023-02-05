@@ -18,24 +18,7 @@ type User struct {
 
 func GetUsers(db *sql.DB, usersTableName, reservationsTableName string) ([]*User, error) {
 	f := func(rows *sql.Rows) (*User, error) {
-		var newUser = User{}
-
-		err := rows.Scan(&newUser.Id, &newUser.Name, &newUser.Surname, &newUser.Patronymic,
-			&newUser.Role, &newUser.Phone, &newUser.Email, &newUser.Photo_src, &newUser.HashedPassword)
-
-		if err != nil {
-			return nil, err
-		}
-
-		reservations, err := GetReservationsByUserId(db, reservationsTableName, newUser.Id)
-
-		if err != nil {
-			return &newUser, err
-		}
-
-		newUser.Reservations = reservations
-
-		return &newUser, nil
+		return ScanUserAndReservationsFromDBRows(rows, db, reservationsTableName)
 	}
 	return getFromDB(db, "select * from "+usersTableName, f)
 }
@@ -58,3 +41,60 @@ func (user *User) String() string {
 	return fmt.Sprintf("User(id=%d name=%v surname=%v patronymic=%v role=%v phone=%v email=%v photo_src=%v %d reservations",
 		user.Id, user.Name, user.Surname, user.Patronymic, user.Role, user.Phone, user.Email, user.Photo_src, len(user.Reservations))
 }
+
+func (user *User) LoadReservationsFromDB(db *sql.DB, reservationsTableName string) error {
+	reservations, err := GetReservationsByUserId(db, reservationsTableName, user.Id)
+
+	if err != nil {
+		return err
+	}
+
+	user.Reservations = reservations
+
+	return nil
+}
+
+func ScanUserFromDBRows(rows *sql.Rows) (*User, error) {
+	var newUser = User{}
+
+	err := rows.Scan(&newUser.Id, &newUser.Name, &newUser.Surname, &newUser.Patronymic,
+		&newUser.Role, &newUser.Phone, &newUser.Email, &newUser.Photo_src, &newUser.HashedPassword)
+
+	return &newUser, err
+}
+
+func ScanUserAndReservationsFromDBRows(rows *sql.Rows, db *sql.DB, reservationsTableName string) (*User, error) {
+	newUser, err := ScanUserFromDBRows(rows)
+
+	if err != nil {
+		return nil, err
+	}
+
+	newUser.LoadReservationsFromDB(db, reservationsTableName)
+
+	return newUser, err
+}
+
+//func GetBy(db *sql.DB, columnName, value string) *User {
+//	f := func(rows *sql.Rows) (*User, error) {
+//		var newUser = User{}
+//
+//		err := rows.Scan(&newUser.Id, &newUser.Name, &newUser.Surname, &newUser.Patronymic,
+//			&newUser.Role, &newUser.Phone, &newUser.Email, &newUser.Photo_src, &newUser.HashedPassword)
+//
+//		if err != nil {
+//			return nil, err
+//		}
+//
+//		reservations, err := GetReservationsByUserId(db, reservationsTableName, newUser.Id)
+//
+//		if err != nil {
+//			return &newUser, err
+//		}
+//
+//		newUser.Reservations = reservations
+//
+//		return &newUser, nil
+//	}
+//	return getFromDB(db, "select * from "+usersTableName, f)
+//}
