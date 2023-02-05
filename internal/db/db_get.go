@@ -3,6 +3,7 @@ package db
 import "database/sql"
 
 func getFromDB[elementType interface{}](db *sql.DB, request string, scanElement func(rows *sql.Rows) (elementType, error)) ([]elementType, error) {
+	println(request)
 	result, err := db.Query(request)
 
 	var all_users []elementType

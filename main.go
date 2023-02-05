@@ -7,18 +7,18 @@ import (
 	"internal/server"
 )
 
-func printAllUsers(db *sql.DB) {
-	println("All users:")
-	allUsers, err := database.GetUsers(db, "users2", "reservations2")
-
-	if err != nil {
-		panic(err)
-	}
-
-	for _, user := range allUsers {
-		println(user.String())
-	}
-}
+//func printAllUsers(db *sql.DB) {
+//	println("All users:")
+//	allUsers, err := database.GetUsers(db, "users2", "reservations2")
+//
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	for _, user := range allUsers {
+//		println(user.String())
+//	}
+//}
 
 func printReservationsByUser(db *sql.DB, userId int) {
 	reservations, err := database.GetReservationsByUserId(db, "reservations2", 2)

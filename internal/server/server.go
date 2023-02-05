@@ -31,6 +31,7 @@ func (server *Server) handleFunc() {
 	http.HandleFunc("/", server.mainPage)
 	http.HandleFunc("/users", server.allUsersPage)
 	http.HandleFunc("/register", server.Register)
+	http.HandleFunc("/login", server.LogIn)
 }
 
 func (server *Server) Start() {

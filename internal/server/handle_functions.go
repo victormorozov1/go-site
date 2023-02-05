@@ -8,7 +8,7 @@ import (
 )
 
 func Hash(s string) string {
-	return s // Тут по нормальному хеширование сделать
+	return s + "типо хэширую" // Тут по нормальному хеширование сделать
 }
 
 func (server *Server) mainPage(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +28,7 @@ func (server *Server) allUsersPage(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, err.Error())
 	}
 
-	allUsers, err := database.GetUsers(server.DataBase, server.UsersTableName, server.ReservationsTableName)
+	allUsers, err := database.GetAllUsers(server.DataBase, server.UsersTableName, server.ReservationsTableName)
 
 	if err != nil {
 		panic(err) // Тут нужно написать возвращение ошибки пользователю
@@ -69,5 +69,45 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 
 		t.Execute(w, nil)
 	}
+}
 
+func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		println("In login")
+		name, password := r.FormValue("name"), r.FormValue("password")
+		dbUsers, err := database.GetUserBy(server.DataBase, "name", name,
+			server.UsersTableName, server.ReservationsTableName)
+
+		if err != nil {
+			panic(err) // Хз что тут может быть, но можно как-то обработать
+		}
+
+		if len(dbUsers) == 0 {
+			// Нужно вернуть ошибку, что пользователь не найден
+			println("Users with name " + name + " not found")
+			return
+		}
+
+		if len(dbUsers) > 1 {
+			panic("Error: found several users with name " + name) // тоже нудно вернуть ошибку пользователю
+		}
+
+		dbUser := dbUsers[0]
+
+		if Hash(password) == dbUser.HashedPassword {
+			println(dbUser.Name + " logged in successfully")
+			// чото тоже вернуть надо
+		} else {
+			println("wrong password")
+			// Нужно вернуть ошибку пароль неверный
+		}
+	} else {
+		t, err := template.ParseFiles("templates/login.html")
+
+		if err != nil {
+			fmt.Fprintf(w, err.Error())
+		}
+
+		t.Execute(w, nil)
+	}
 }

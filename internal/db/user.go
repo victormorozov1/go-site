@@ -16,11 +16,15 @@ type User struct {
 	Reservations              []*Reservation
 }
 
-func GetUsers(db *sql.DB, usersTableName, reservationsTableName string) ([]*User, error) {
+func GetUsers(db *sql.DB, usersTableName, reservationsTableName, criteria string) ([]*User, error) {
 	f := func(rows *sql.Rows) (*User, error) {
 		return ScanUserAndReservationsFromDBRows(rows, db, reservationsTableName)
 	}
-	return getFromDB(db, "select * from "+usersTableName, f)
+	return getFromDB(db, "select * from "+usersTableName+" WHERE "+criteria, f)
+}
+
+func GetAllUsers(db *sql.DB, usersTableName, reservationsTableName string) ([]*User, error) {
+	return GetUsers(db, usersTableName, reservationsTableName, "")
 }
 
 func (user *User) SaveToDB(db *sql.DB, usersTableName string) error {
@@ -75,26 +79,6 @@ func ScanUserAndReservationsFromDBRows(rows *sql.Rows, db *sql.DB, reservationsT
 	return newUser, err
 }
 
-//func GetBy(db *sql.DB, columnName, value string) *User {
-//	f := func(rows *sql.Rows) (*User, error) {
-//		var newUser = User{}
-//
-//		err := rows.Scan(&newUser.Id, &newUser.Name, &newUser.Surname, &newUser.Patronymic,
-//			&newUser.Role, &newUser.Phone, &newUser.Email, &newUser.Photo_src, &newUser.HashedPassword)
-//
-//		if err != nil {
-//			return nil, err
-//		}
-//
-//		reservations, err := GetReservationsByUserId(db, reservationsTableName, newUser.Id)
-//
-//		if err != nil {
-//			return &newUser, err
-//		}
-//
-//		newUser.Reservations = reservations
-//
-//		return &newUser, nil
-//	}
-//	return getFromDB(db, "select * from "+usersTableName, f)
-//}
+func GetUserBy(db *sql.DB, columnName, value, usersTableName, reservationsTableName string) ([]*User, error) {
+	return GetUsers(db, usersTableName, reservationsTableName, columnName+"='"+value+"'")
+}
