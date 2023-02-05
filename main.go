@@ -33,7 +33,12 @@ func printReservationsByUser(db *sql.DB, userId int) {
 }
 
 func main() {
-	s := server.Server{"127.0.0.1", 8080, nil, "users2", "reservations2"}
+	s := server.Server{
+		Host:                  "127.0.0.1",
+		Port:                  8080,
+		UsersTableName:        "users",
+		ReservationsTableName: "reservations2",
+	}
 	s.Start()
 	//db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")
 	//

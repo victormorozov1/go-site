@@ -42,14 +42,15 @@ func GetUsers(db *sql.DB, usersTableName, reservationsTableName string) ([]*User
 
 func (user *User) SaveToDB(db *sql.DB, usersTableName string) error {
 	return SaveToDB(db, usersTableName, map[string]string{
-		"id":         strconv.Itoa(user.Id), //По идее если id=0 то его не нужно отправлять, но оно и так игнорируется почему-то
-		"name":       user.Name,
-		"surname":    user.Surname,
-		"patronymic": user.Patronymic,
-		"role":       user.Role,
-		"phone":      user.Phone,
-		"email":      user.Email,
-		"photo_src":  user.Photo_src,
+		"id":              strconv.Itoa(user.Id), //По идее если id=0 то его не нужно отправлять, но оно и так игнорируется почему-то
+		"name":            user.Name,
+		"surname":         user.Surname,
+		"patronymic":      user.Patronymic,
+		"role":            user.Role,
+		"phone":           user.Phone,
+		"email":           user.Email,
+		"photo_src":       user.Photo_src,
+		"hashed_password": user.HashedPassword,
 	})
 }
 
