@@ -21,7 +21,7 @@ func GetUsers(db *sql.DB, usersTableName, reservationsTableName string) ([]*User
 		var newUser = User{}
 
 		err := rows.Scan(&newUser.Id, &newUser.Name, &newUser.Surname, &newUser.Patronymic,
-			&newUser.Role, &newUser.Phone, &newUser.Email, &newUser.Photo_src)
+			&newUser.Role, &newUser.Phone, &newUser.Email, &newUser.Photo_src, &newUser.HashedPassword)
 
 		if err != nil {
 			return nil, err
