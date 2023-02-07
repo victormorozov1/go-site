@@ -101,7 +101,7 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 
 			// Можно добавить структуру сессии, если много данных нужно будет хранить
 			session := server.CreateSession()
-			session.Name = name
+			session.UserId = dbUser.Id
 			println("Created session id = " + session.String())
 
 			cookie := &http.Cookie{
@@ -127,6 +127,61 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//func UserPage(w http.ResponseWriter, r *http.Request) {
-//
-//}
+func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
+	var err error
+
+	var t *template.Template
+	t, err = template.ParseFiles("templates/user.html")
+
+	type TemplateData struct {
+		Name, Surname, Patronymic string
+		Role                      string
+		Phone, Email              string
+		PhotoSc                   string
+	}
+	var templateData TemplateData
+
+	defer func() {
+		t.Execute(w, templateData)
+		if err != nil {
+			println(err)
+		}
+	}()
+
+	var cookie *http.Cookie
+	cookie, err = r.Cookie(server.CookieName)
+	if err != nil {
+		return
+	}
+
+	var sessionId int
+	sessionId, err = strconv.Atoi(cookie.Value)
+	if err != nil {
+		return
+	}
+
+	var (
+		session *Session
+		ok      bool
+	)
+	session, ok = server.Sessions[sessionId]
+	if !ok {
+		println("Session#" + strconv.Itoa(sessionId) + "not found")
+		return
+	}
+
+	var users []*database.User
+	users, err = database.GetUserBy(server.DataBase, "id", strconv.Itoa(session.UserId),
+		server.UsersTableName, server.ReservationsTableName) // добавить функцию GetUserById
+	user := users[0]
+
+	templateData.Phone = user.Phone
+	templateData.Email = user.Email
+	templateData.PhotoSc = user.Photo_src
+	templateData.Role = user.Role
+	templateData.Patronymic = user.Patronymic
+	templateData.Name = user.Name
+	templateData.Surname = user.Surname
+
+	print("returning template data .name " + user.Surname)
+}
