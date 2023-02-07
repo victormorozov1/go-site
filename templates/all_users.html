@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>AllUsers</title>
+    {{ template "include" }}
 </head>
 <body>
+    {{ template "navbar" }}
     <p>В системе зарегестрировано: {{ .UsersNum }}</p>
     {{ range .UsersArr }}
         <p>{{ .Name }}</p>

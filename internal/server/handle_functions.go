@@ -14,7 +14,7 @@ func Hash(s string) string {
 }
 
 func (server *Server) mainPage(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("templates/index.html")
+	t, err := template.ParseFiles("templates/index.html", "templates/navbar.html", "templates/include.html")
 
 	if err != nil {
 		fmt.Fprintf(w, err.Error())
@@ -24,7 +24,7 @@ func (server *Server) mainPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) allUsersPage(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("templates/all_users.html")
+	t, err := template.ParseFiles("templates/all_users.html", "templates/navbar.html", "templates/include.html")
 
 	if err != nil {
 		fmt.Fprintf(w, err.Error())
@@ -63,7 +63,7 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 			// Нужно вернуть ошибку ПАРОЛИ НЕ СОВПАДАЮТ
 		}
 	} else {
-		t, err := template.ParseFiles("templates/register.html")
+		t, err := template.ParseFiles("templates/register.html", "templates/navbar.html", "templates/include.html")
 
 		if err != nil {
 			fmt.Fprintf(w, err.Error())
@@ -117,7 +117,7 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 			// Нужно вернуть ошибку пароль неверный
 		}
 	} else {
-		t, err := template.ParseFiles("templates/login.html")
+		t, err := template.ParseFiles("templates/login.html", "templates/navbar.html", "templates/include.html")
 
 		if err != nil {
 			fmt.Fprintf(w, err.Error())
@@ -131,7 +131,7 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 	var err error
 
 	var t *template.Template
-	t, err = template.ParseFiles("templates/user.html")
+	t, err = template.ParseFiles("templates/user.html", "templates/navbar.html", "templates/include.html")
 
 	type TemplateData struct {
 		Name, Surname, Patronymic string

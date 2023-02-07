@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>Your Cabinet</title>
+    {{ template "include" }}
 </head>
 <body>
-  {{ .Name }}
+{{ template "navbar" }}
+{{ .Name }}
 {{ .Surname }}
 {{ .Role }}
 {{ .Phone }}
