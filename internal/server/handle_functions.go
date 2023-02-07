@@ -5,6 +5,7 @@ import (
 	"html/template"
 	database "internal/db"
 	"net/http"
+	"time"
 )
 
 func Hash(s string) string {
@@ -96,6 +97,15 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 
 		if Hash(password) == dbUser.HashedPassword {
 			println(dbUser.Name + " logged in successfully")
+
+			// Можно добавить структуру сессии, если много данных нужно будет хранить
+			cookie := &http.Cookie{
+				Name:    server.CookieName,
+				Value:   name, // Нужно хотя-бы имя хешировать, присем не так как пароль
+				Expires: time.Now().Add(time.Minute * 10),
+			}
+
+			http.SetCookie(w, cookie)
 			// чото тоже вернуть надо
 		} else {
 			println("wrong password")

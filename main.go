@@ -38,6 +38,7 @@ func main() {
 		Port:                  8080,
 		UsersTableName:        "users",
 		ReservationsTableName: "reservations2",
+		CookieName:            "data",
 	}
 	s.Start()
 	//db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")

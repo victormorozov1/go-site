@@ -11,21 +11,12 @@ type Server struct {
 	Port                                  int
 	DataBase                              *sql.DB
 	UsersTableName, ReservationsTableName string
+	CookieName                            string
 }
 
 func (server *Server) String() string {
 	return fmt.Sprintf("Server(%s:%d)", server.Host, server.Port)
 }
-
-//func (server *Server) parseFiles(w http.ResponseWriter, fileNames ...string) *template.Template {
-//	t, err := template.ParseFiles(fileNames...)
-//
-//	if err != nil {
-//		fmt.Fprintf(w, err.Error())
-//	}
-//
-//	return t
-//}
 
 func (server *Server) handleFunc() {
 	http.HandleFunc("/", server.mainPage)
