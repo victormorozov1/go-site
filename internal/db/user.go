@@ -20,7 +20,10 @@ func GetUsers(db *sql.DB, usersTableName, reservationsTableName, criteria string
 	f := func(rows *sql.Rows) (*User, error) {
 		return ScanUserAndReservationsFromDBRows(rows, db, reservationsTableName)
 	}
-	return getFromDB(db, "select * from "+usersTableName+" WHERE "+criteria, f)
+	if criteria != "" {
+		criteria = "WHERE " + criteria
+	}
+	return getFromDB(db, "select * from "+usersTableName+criteria, f)
 }
 
 func GetAllUsers(db *sql.DB, usersTableName, reservationsTableName string) ([]*User, error) {
