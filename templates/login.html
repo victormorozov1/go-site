@@ -12,6 +12,9 @@
     <input type="text" name="name" id="name" placeholder="Enter our name">
     <input type="password" name="password" id="password" placeholder="Enter password">
     <button>Login</button>
+    {{ if ne .Error "" }}
+        {{ .Error }}
+    {{ end }}
 </form>
 </body>
 </html>

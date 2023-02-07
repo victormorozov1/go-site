@@ -16,12 +16,27 @@ type User struct {
 	Reservations              []*Reservation
 }
 
+type Error struct { // Вынести в отдельный файл
+	Message string
+}
+
+func (error *Error) Error() string {
+	return error.Message
+}
+
+func (user *User) Check() error { // Можно сделать получше, я пока набросал
+	if user.Name == "" {
+		return &Error{"Empty name"}
+	}
+	return nil
+}
+
 func GetUsers(db *sql.DB, usersTableName, reservationsTableName, criteria string) ([]*User, error) {
 	f := func(rows *sql.Rows) (*User, error) {
 		return ScanUserAndReservationsFromDBRows(rows, db, reservationsTableName)
 	}
 	if criteria != "" {
-		criteria = "WHERE " + criteria
+		criteria = " WHERE " + criteria
 	}
 	return getFromDB(db, "select * from "+usersTableName+criteria, f)
 }

@@ -13,6 +13,10 @@ func Hash(s string) string {
 	return s + "типо хэширую" // Тут по нормальному хеширование сделать
 }
 
+type errorStruct struct {
+	Error string
+}
+
 func (server *Server) mainPage(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/index.html", "templates/navbar.html", "templates/include.html")
 
@@ -24,26 +28,42 @@ func (server *Server) mainPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) allUsersPage(w http.ResponseWriter, r *http.Request) {
+	type templateData struct {
+		UsersNum int
+		UsersArr []*database.User
+		Error    string
+	}
+
 	t, err := template.ParseFiles("templates/all_users.html", "templates/navbar.html", "templates/include.html")
 
 	if err != nil {
-		fmt.Fprintf(w, err.Error())
+		t.Execute(w, templateData{Error: err.Error()})
+		return
 	}
 
 	allUsers, err := database.GetAllUsers(server.DataBase, server.UsersTableName, server.ReservationsTableName)
 
 	if err != nil {
-		panic(err) // Тут нужно написать возвращение ошибки пользователю
+		t.Execute(w, templateData{Error: err.Error()})
+		println("Error: " + err.Error())
+		return
 	}
 
-	type templateData struct {
-		UsersNum int
-		UsersArr []*database.User
-	}
-	t.Execute(w, &templateData{len(allUsers), allUsers}) // Тут нельзя возвращать пароли
+	t.Execute(w, &templateData{
+		UsersNum: len(allUsers),
+		UsersArr: allUsers,
+	}) // Тут нельзя возвращать пароли
 }
 
 func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("templates/register.html", "templates/navbar.html", "templates/include.html")
+
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		panic(err)
+		return
+	}
+
 	if r.Method == "POST" {
 		name, password, repeatPassword := r.FormValue("name"), r.FormValue("password"), r.FormValue("repeat-password")
 		if password == repeatPassword {
@@ -51,29 +71,38 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 				Name:           name,
 				HashedPassword: Hash(password),
 			}
+
+			err = newUser.Check()
+			if err != nil {
+				print(err)
+				t.Execute(w, errorStruct{err.Error()})
+				return
+			}
+
 			println(newUser.String())
-			err := newUser.SaveToDB(server.DataBase, server.UsersTableName)
+			err = newUser.SaveToDB(server.DataBase, server.UsersTableName)
 			if err != nil {
 				println(err)
-				// Нужно вернуть ошибку
+
 			} else {
-				// редирект регистрация успешна
+				http.Redirect(w, r, "/me", http.StatusSeeOther)
 			}
 		} else {
-			// Нужно вернуть ошибку ПАРОЛИ НЕ СОВПАДАЮТ
+			t.Execute(w, errorStruct{"Passwords don't match"})
 		}
 	} else {
-		t, err := template.ParseFiles("templates/register.html", "templates/navbar.html", "templates/include.html")
-
-		if err != nil {
-			fmt.Fprintf(w, err.Error())
-		}
-
-		t.Execute(w, nil)
+		t.Execute(w, errorStruct{""})
 	}
 }
 
 func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("templates/login.html", "templates/navbar.html", "templates/include.html")
+	if err != nil {
+		println(err.Error())
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
 	if r.Method == "POST" {
 		println("In login")
 		name, password := r.FormValue("name"), r.FormValue("password")
@@ -81,11 +110,13 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 			server.UsersTableName, server.ReservationsTableName)
 
 		if err != nil {
+			t.Execute(w, errorStruct{"Error on server"})
 			panic(err) // Хз что тут может быть, но можно как-то обработать
+			return
 		}
 
 		if len(dbUsers) == 0 {
-			// Нужно вернуть ошибку, что пользователь не найден
+			t.Execute(w, errorStruct{"User not found"})
 			println("Users with name " + name + " not found")
 			return
 		}
@@ -99,30 +130,23 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 		if Hash(password) == dbUser.HashedPassword {
 			println(dbUser.Name + " logged in successfully")
 
-			// Можно добавить структуру сессии, если много данных нужно будет хранить
 			session := server.CreateSession()
 			session.UserId = dbUser.Id
 			println("Created session id = " + session.String())
 
 			cookie := &http.Cookie{
 				Name:    server.CookieName,
-				Value:   strconv.Itoa(session.Id), // Нужно хотя-бы имя хешировать, присем не так как пароль
+				Value:   strconv.Itoa(session.Id),
 				Expires: time.Now().Add(time.Minute * 10),
 			}
 
 			http.SetCookie(w, cookie)
-			// чото тоже вернуть надо
+			http.Redirect(w, r, "/me", http.StatusSeeOther)
 		} else {
 			println("wrong password")
-			// Нужно вернуть ошибку пароль неверный
+			t.Execute(w, errorStruct{"Wrong password"})
 		}
 	} else {
-		t, err := template.ParseFiles("templates/login.html", "templates/navbar.html", "templates/include.html")
-
-		if err != nil {
-			fmt.Fprintf(w, err.Error())
-		}
-
 		t.Execute(w, nil)
 	}
 }
