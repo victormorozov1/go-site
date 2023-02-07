@@ -5,6 +5,7 @@ import (
 	"html/template"
 	database "internal/db"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -99,9 +100,13 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 			println(dbUser.Name + " logged in successfully")
 
 			// Можно добавить структуру сессии, если много данных нужно будет хранить
+			session := server.CreateSession()
+			session.Name = name
+			println("Created session id = " + session.String())
+
 			cookie := &http.Cookie{
 				Name:    server.CookieName,
-				Value:   name, // Нужно хотя-бы имя хешировать, присем не так как пароль
+				Value:   strconv.Itoa(session.Id), // Нужно хотя-бы имя хешировать, присем не так как пароль
 				Expires: time.Now().Add(time.Minute * 10),
 			}
 
@@ -121,3 +126,7 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 		t.Execute(w, nil)
 	}
 }
+
+//func UserPage(w http.ResponseWriter, r *http.Request) {
+//
+//}

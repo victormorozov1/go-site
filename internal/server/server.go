@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"fmt"
+	"math/rand"
 	"net/http"
 )
 
@@ -12,6 +13,7 @@ type Server struct {
 	DataBase                              *sql.DB
 	UsersTableName, ReservationsTableName string
 	CookieName                            string
+	Sessions                              map[int]*Session
 }
 
 func (server *Server) String() string {
@@ -26,6 +28,10 @@ func (server *Server) handleFunc() {
 }
 
 func (server *Server) Start() {
+	if server.Sessions == nil {
+		server.Sessions = make(map[int]*Session)
+	}
+
 	fmt.Print("Start ", server)
 	server.handleFunc()
 
@@ -37,4 +43,15 @@ func (server *Server) Start() {
 	defer server.DataBase.Close()
 
 	http.ListenAndServe(fmt.Sprintf(":%d", server.Port), nil)
+}
+
+func (server *Server) CreateSession() *Session {
+	id := 0
+	ok := true
+	for ok {
+		id = rand.Int()
+		_, ok = server.Sessions[id]
+	}
+	server.Sessions[id] = &Session{Id: id}
+	return server.Sessions[id]
 }
