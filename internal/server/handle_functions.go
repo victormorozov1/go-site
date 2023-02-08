@@ -13,10 +13,6 @@ func Hash(s string) string {
 	return s + "типо хэширую" // Тут по нормальному хеширование сделать
 }
 
-type errorStruct struct {
-	Error string
-}
-
 func (server *Server) mainPage(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/index.html", "templates/navbar.html", "templates/include.html")
 
@@ -28,30 +24,24 @@ func (server *Server) mainPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) allUsersPage(w http.ResponseWriter, r *http.Request) {
-	type templateData struct {
-		UsersNum int
-		UsersArr []*database.User
-		Error    string
-	}
-
 	t, err := template.ParseFiles("templates/all_users.html", "templates/navbar.html", "templates/include.html")
 
 	if err != nil {
-		t.Execute(w, templateData{Error: err.Error()})
+		t.Execute(w, map[string]string{"Error": err.Error()})
 		return
 	}
 
 	allUsers, err := database.GetAllUsers(server.DataBase, server.UsersTableName, server.ReservationsTableName)
 
 	if err != nil {
-		t.Execute(w, templateData{Error: err.Error()})
+		t.Execute(w, map[string]string{"Error": err.Error()})
 		println("Error: " + err.Error())
 		return
 	}
 
-	t.Execute(w, &templateData{
-		UsersNum: len(allUsers),
-		UsersArr: allUsers,
+	t.Execute(w, map[string]interface{}{
+		"UsersNum": len(allUsers),
+		"UsersArr": allUsers,
 	}) // Тут нельзя возвращать пароли
 }
 
@@ -75,7 +65,7 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 			err = newUser.Check()
 			if err != nil {
 				print(err)
-				t.Execute(w, errorStruct{err.Error()})
+				t.Execute(w, map[string]string{"Error": err.Error()})
 				return
 			}
 
@@ -88,10 +78,10 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, server.AllUsersPage, http.StatusSeeOther)
 			}
 		} else {
-			t.Execute(w, errorStruct{"Passwords don't match"})
+			t.Execute(w, map[string]string{"Error": "Passwords don't match"})
 		}
 	} else {
-		t.Execute(w, errorStruct{""})
+		t.Execute(w, map[string]string{"Error": ""}) // Лучше даже везде делать Errors[]
 	}
 }
 
@@ -110,13 +100,13 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 			server.UsersTableName, server.ReservationsTableName)
 
 		if err != nil {
-			t.Execute(w, errorStruct{"Error on server"})
+			t.Execute(w, map[string]string{"Error": "Error on server"})
 			panic(err) // Хз что тут может быть, но можно как-то обработать
 			return
 		}
 
 		if len(dbUsers) == 0 {
-			t.Execute(w, errorStruct{"User not found"})
+			t.Execute(w, map[string]string{"Error": "User not found"})
 			println("Users with name " + name + " not found")
 			return
 		}
@@ -144,7 +134,7 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, server.UserCabinet, http.StatusSeeOther)
 		} else {
 			println("wrong password")
-			t.Execute(w, errorStruct{"Wrong password"})
+			t.Execute(w, map[string]string{"Error": "Wrong password"})
 		}
 	} else {
 		t.Execute(w, nil)
@@ -153,20 +143,11 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 
 func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 	var err error
-
 	var t *template.Template
+
 	t, err = template.ParseFiles("templates/user.html", "templates/navbar.html", "templates/include.html")
 
-	type TemplateData struct {
-		Name, Surname, Patronymic string
-		Role                      string
-		Phone, Email              string
-		PhotoSc                   string
-	}
-	var templateData TemplateData
-
 	defer func() {
-		t.Execute(w, templateData)
 		if err != nil {
 			println(err)
 		}
@@ -175,12 +156,14 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 	var cookie *http.Cookie
 	cookie, err = r.Cookie(server.CookieName)
 	if err != nil {
+		t.Execute(w, err.Error())
 		return
 	}
 
 	var sessionId int
 	sessionId, err = strconv.Atoi(cookie.Value)
 	if err != nil {
+		t.Execute(w, err.Error())
 		return
 	}
 
@@ -199,13 +182,13 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 		server.UsersTableName, server.ReservationsTableName) // добавить функцию GetUserById
 	user := users[0]
 
-	templateData.Phone = user.Phone
-	templateData.Email = user.Email
-	templateData.PhotoSc = user.Photo_src
-	templateData.Role = user.Role
-	templateData.Patronymic = user.Patronymic
-	templateData.Name = user.Name
-	templateData.Surname = user.Surname
-
-	print("returning template data .name " + user.Surname)
+	t.Execute(w, map[string]interface{}{
+		"Phone":      user.Phone,
+		"Email":      user.Email,
+		"PhotoSc":    user.Photo_src,
+		"Role":       user.Role,
+		"Patronymic": user.Patronymic,
+		"Name":       user.Name,
+		"Surname":    user.Surname,
+	})
 }
