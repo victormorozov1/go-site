@@ -85,7 +85,7 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 				println(err)
 
 			} else {
-				http.Redirect(w, r, "/me", http.StatusSeeOther)
+				http.Redirect(w, r, "/users", http.StatusSeeOther)
 			}
 		} else {
 			t.Execute(w, errorStruct{"Passwords don't match"})
