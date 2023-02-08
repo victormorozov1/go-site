@@ -59,7 +59,7 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/register.html", "templates/navbar.html", "templates/include.html")
 
 	if err != nil {
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, server.MainPage, http.StatusSeeOther)
 		panic(err)
 		return
 	}
@@ -85,7 +85,7 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 				println(err)
 
 			} else {
-				http.Redirect(w, r, "/users", http.StatusSeeOther)
+				http.Redirect(w, r, server.AllUsersPage, http.StatusSeeOther)
 			}
 		} else {
 			t.Execute(w, errorStruct{"Passwords don't match"})
@@ -99,7 +99,7 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/login.html", "templates/navbar.html", "templates/include.html")
 	if err != nil {
 		println(err.Error())
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, server.MainPage, http.StatusSeeOther)
 		return
 	}
 
@@ -141,7 +141,7 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 			}
 
 			http.SetCookie(w, cookie)
-			http.Redirect(w, r, "/me", http.StatusSeeOther)
+			http.Redirect(w, r, server.UserCabinet, http.StatusSeeOther)
 		} else {
 			println("wrong password")
 			t.Execute(w, errorStruct{"Wrong password"})

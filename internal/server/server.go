@@ -8,12 +8,14 @@ import (
 )
 
 type Server struct {
-	Host                                  string
-	Port                                  int
-	DataBase                              *sql.DB
-	UsersTableName, ReservationsTableName string
-	CookieName                            string
-	Sessions                              map[int]*Session
+	Host                                               string
+	Port                                               int
+	DataBase                                           *sql.DB
+	UsersTableName, ReservationsTableName              string
+	CookieName                                         string
+	Sessions                                           map[int]*Session
+	MainPage                                           string
+	AllUsersPage, UserCabinet, RegisterPage, LoginPage string
 }
 
 func (server *Server) String() string {

@@ -39,6 +39,11 @@ func main() {
 		UsersTableName:        "users",
 		ReservationsTableName: "reservations2",
 		CookieName:            "data",
+		MainPage:              "/",
+		AllUsersPage:          "/users",
+		UserCabinet:           "/me",
+		RegisterPage:          "/register",
+		LoginPage:             "/login",
 	}
 	s.Start()
 	//db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")
