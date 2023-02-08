@@ -23,11 +23,11 @@ func (server *Server) String() string {
 }
 
 func (server *Server) handleFunc() {
-	http.HandleFunc("/", server.mainPage) // Переписать на server.Main
-	http.HandleFunc("/users", server.allUsersPage)
-	http.HandleFunc("/register", server.Register)
-	http.HandleFunc("/login", server.LogIn)
-	http.HandleFunc("/me", server.UserPage)
+	http.HandleFunc(server.MainPage, server.mainPage)
+	http.HandleFunc(server.AllUsersPage, server.allUsersPage)
+	http.HandleFunc(server.RegisterPage, server.Register)
+	http.HandleFunc(server.LoginPage, server.LogIn)
+	http.HandleFunc(server.UserCabinet, server.UserPage)
 }
 
 func (server *Server) Start() {
