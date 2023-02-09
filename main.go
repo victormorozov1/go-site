@@ -39,12 +39,19 @@ func main() {
 		UsersTableName:        "users",
 		ReservationsTableName: "reservations2",
 		CookieName:            "data",
-		MainPage:              "/",
-		AllUsersPage:          "/users",
-		UserCabinet:           "/me",
-		RegisterPage:          "/register",
-		LoginPage:             "/login",
+		Routes: &server.Routes{
+			MainPage:     "/",
+			AllUsersPage: "/users",
+			UserCabinet:  "/me",
+			RegisterPage: "/register",
+			LoginPage:    "/login",
+			TestPage:     "/test",
+		},
 	}
+	baseTemplatesData := make(map[string]interface{}) // Это бы вынести в какой-то логичный метод создания сервера
+	server.AddRoutesData(&baseTemplatesData, &s)
+	s.BaseTemplateData = baseTemplatesData
+
 	s.Start()
 	//db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")
 	//

@@ -7,7 +7,7 @@
 </head>
 <body>
 <form action="/login" method="post">
-    {{ template "navbar" }}
+    {{ template "navbar" . }}
     <h1>Login</h1>
     <input type="text" name="name" id="name" placeholder="Enter our name">
     <input type="password" name="password" id="password" placeholder="Enter password">

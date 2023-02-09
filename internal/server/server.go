@@ -3,19 +3,26 @@ package server
 import (
 	"database/sql"
 	"fmt"
+	"golang.org/x/exp/maps"
 	"math/rand"
 	"net/http"
 )
 
-type Server struct {
-	Host                                               string
-	Port                                               int
-	DataBase                                           *sql.DB
-	UsersTableName, ReservationsTableName              string
-	CookieName                                         string
-	Sessions                                           map[int]*Session
+type Routes struct {
 	MainPage                                           string
 	AllUsersPage, UserCabinet, RegisterPage, LoginPage string
+	TestPage                                           string
+}
+
+type Server struct {
+	Host                                  string
+	Port                                  int
+	DataBase                              *sql.DB
+	UsersTableName, ReservationsTableName string
+	CookieName                            string
+	Sessions                              map[int]*Session
+	Routes                                *Routes
+	BaseTemplateData                      map[string]interface{}
 }
 
 func (server *Server) String() string {
@@ -23,11 +30,12 @@ func (server *Server) String() string {
 }
 
 func (server *Server) handleFunc() {
-	http.HandleFunc(server.MainPage, server.mainPage)
-	http.HandleFunc(server.AllUsersPage, server.allUsersPage)
-	http.HandleFunc(server.RegisterPage, server.Register)
-	http.HandleFunc(server.LoginPage, server.LogIn)
-	http.HandleFunc(server.UserCabinet, server.UserPage)
+	http.HandleFunc(server.Routes.MainPage, server.mainPage)
+	http.HandleFunc(server.Routes.AllUsersPage, server.allUsersPage)
+	http.HandleFunc(server.Routes.RegisterPage, server.Register)
+	http.HandleFunc(server.Routes.LoginPage, server.LogIn)
+	http.HandleFunc(server.Routes.UserCabinet, server.UserPage)
+	http.HandleFunc(server.Routes.TestPage, server.TestPage)
 }
 
 func (server *Server) Start() {
@@ -57,4 +65,15 @@ func (server *Server) CreateSession() *Session {
 	}
 	server.Sessions[id] = &Session{Id: id}
 	return server.Sessions[id]
+}
+
+func AddRoutesData(data *map[string]interface{}, server *Server) {
+	(*data)["Routes"] = server.Routes
+}
+
+func JoinData(data1 *map[string]interface{}, data2 *map[string]interface{}) *map[string]interface{} { // Вынести куда-нибудь
+	resData := make(map[string]interface{})
+	maps.Copy(resData, *data1)
+	maps.Copy(resData, *data2)
+	return &resData
 }

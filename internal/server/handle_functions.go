@@ -20,36 +20,37 @@ func (server *Server) mainPage(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, err.Error())
 	}
 
-	t.Execute(w, nil)
+	t.Execute(w, server.BaseTemplateData)
 }
 
 func (server *Server) allUsersPage(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/all_users.html", "templates/navbar.html", "templates/include.html")
 
 	if err != nil {
-		t.Execute(w, map[string]string{"Error": err.Error()})
+		t.Execute(w, JoinData(&map[string]interface{}{"Error": err.Error()}, &server.BaseTemplateData))
 		return
 	}
 
 	allUsers, err := database.GetAllUsers(server.DataBase, server.UsersTableName, server.ReservationsTableName)
 
 	if err != nil {
-		t.Execute(w, map[string]string{"Error": err.Error()})
+		t.Execute(w, JoinData(&map[string]interface{}{"Error": err.Error()}, &server.BaseTemplateData))
 		println("Error: " + err.Error())
 		return
 	}
 
-	t.Execute(w, map[string]interface{}{
+	t.Execute(w, JoinData(&map[string]interface{}{
 		"UsersNum": len(allUsers),
 		"UsersArr": allUsers,
-	}) // Тут нельзя возвращать пароли
+	},
+		&server.BaseTemplateData)) // Тут нельзя возвращать пароли
 }
 
 func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/register.html", "templates/navbar.html", "templates/include.html")
 
 	if err != nil {
-		http.Redirect(w, r, server.MainPage, http.StatusSeeOther)
+		http.Redirect(w, r, server.Routes.MainPage, http.StatusSeeOther)
 		panic(err)
 		return
 	}
@@ -65,7 +66,9 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 			err = newUser.Check()
 			if err != nil {
 				print(err)
-				t.Execute(w, map[string]string{"Error": err.Error()})
+				t.Execute(w, JoinData(
+					&map[string]interface{}{"Error": err.Error()},
+					&server.BaseTemplateData))
 				return
 			}
 
@@ -73,15 +76,16 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 			err = newUser.SaveToDB(server.DataBase, server.UsersTableName)
 			if err != nil {
 				println(err)
-
 			} else {
-				http.Redirect(w, r, server.AllUsersPage, http.StatusSeeOther)
+				http.Redirect(w, r, server.Routes.AllUsersPage, http.StatusSeeOther)
 			}
 		} else {
 			t.Execute(w, map[string]string{"Error": "Passwords don't match"})
 		}
 	} else {
-		t.Execute(w, map[string]string{"Error": ""}) // Лучше даже везде делать Errors[]
+		t.Execute(w, JoinData(
+			&map[string]interface{}{"Error": ""},
+			&server.BaseTemplateData)) // Лучше даже везде делать Errors[]
 	}
 }
 
@@ -89,7 +93,7 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/login.html", "templates/navbar.html", "templates/include.html")
 	if err != nil {
 		println(err.Error())
-		http.Redirect(w, r, server.MainPage, http.StatusSeeOther)
+		http.Redirect(w, r, server.Routes.MainPage, http.StatusSeeOther)
 		return
 	}
 
@@ -100,13 +104,17 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 			server.UsersTableName, server.ReservationsTableName)
 
 		if err != nil {
-			t.Execute(w, map[string]string{"Error": "Error on server"})
+			t.Execute(w, JoinData(
+				&map[string]interface{}{"Error": "Error on server"},
+				&server.BaseTemplateData))
 			panic(err) // Хз что тут может быть, но можно как-то обработать
 			return
 		}
 
 		if len(dbUsers) == 0 {
-			t.Execute(w, map[string]string{"Error": "User not found"})
+			t.Execute(w, JoinData(
+				&map[string]interface{}{"Error": "User not found"},
+				&server.BaseTemplateData))
 			println("Users with name " + name + " not found")
 			return
 		}
@@ -131,13 +139,16 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 			}
 
 			http.SetCookie(w, cookie)
-			http.Redirect(w, r, server.UserCabinet, http.StatusSeeOther)
+			http.Redirect(w, r, server.Routes.UserCabinet, http.StatusSeeOther)
 		} else {
 			println("wrong password")
-			t.Execute(w, map[string]string{"Error": "Wrong password"})
+			t.Execute(w, JoinData(
+				&map[string]interface{}{"Error": "Wrong password"},
+				&server.BaseTemplateData,
+			))
 		}
 	} else {
-		t.Execute(w, nil)
+		t.Execute(w, server.BaseTemplateData)
 	}
 }
 
@@ -182,7 +193,7 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 		server.UsersTableName, server.ReservationsTableName) // добавить функцию GetUserById
 	user := users[0]
 
-	t.Execute(w, map[string]interface{}{
+	data := map[string]interface{}{
 		"Phone":      user.Phone,
 		"Email":      user.Email,
 		"PhotoSc":    user.Photo_src,
@@ -190,5 +201,17 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 		"Patronymic": user.Patronymic,
 		"Name":       user.Name,
 		"Surname":    user.Surname,
-	})
+	}
+	AddRoutesData(&data, server)
+
+	t.Execute(w, data)
+}
+
+func (server *Server) TestPage(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("templates/test.html")
+	if err != nil {
+		print(err)
+	}
+	println("returning in test", server.BaseTemplateData)
+	t.Execute(w, server.BaseTemplateData)
 }
