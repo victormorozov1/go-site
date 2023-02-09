@@ -28,6 +28,7 @@ func (user *User) Check() error { // Можно сделать получше, �
 	if user.Name == "" {
 		return &Error{"Empty name"}
 	}
+
 	return nil
 }
 

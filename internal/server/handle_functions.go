@@ -63,7 +63,7 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 				HashedPassword: Hash(password),
 			}
 
-			err = newUser.Check()
+			err = RegisterUserCheck(server, &newUser)
 			if err != nil {
 				print(err)
 				t.Execute(w, JoinData(
