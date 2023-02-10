@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"strconv"
 )
@@ -16,17 +17,9 @@ type User struct {
 	Reservations              []*Reservation
 }
 
-type Error struct { // Вынести в отдельный файл
-	Message string
-}
-
-func (error *Error) Error() string {
-	return error.Message
-}
-
 func (user *User) Check() error { // Можно сделать получше, я пока набросал
 	if user.Name == "" {
-		return &Error{"Empty name"}
+		return errors.New("Empty name")
 	}
 
 	return nil
@@ -107,13 +100,13 @@ func GetUserById(db *sql.DB, id int, usersTableName string) (*User, error) {
 	}
 
 	if len(users) == 0 {
-		return nil, &Error{"User not found"}
+		return nil, errors.New("User not found")
 	}
 
 	if len(users) == 0 {
-		err := Error{"many users with id=" + strconv.Itoa(id)}
+		err := errors.New("many users with id=" + strconv.Itoa(id))
 		panic(err.Error())
-		return nil, &err
+		return nil, err
 	}
 
 	return users[0], nil

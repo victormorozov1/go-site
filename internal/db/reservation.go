@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"strconv"
 )
@@ -41,7 +42,7 @@ func GetReservationById(db *sql.DB, reservationTableName string, id int) (*Reser
 		return nil, err
 	}
 	if len(reservations) == 0 {
-		return nil, &Error{"Reservation #" + strconv.Itoa(id) + " not found"}
+		return nil, errors.New("Reservation #" + strconv.Itoa(id) + " not found")
 	}
 	if len(reservations) > 1 {
 		panic("many reservations with id = " + strconv.Itoa(id))

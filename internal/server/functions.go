@@ -1,6 +1,9 @@
 package server
 
-import "internal/db"
+import (
+	"errors"
+	"internal/db"
+)
 
 func UsernameExists(server *Server, name string) (bool, error) {
 	allUsers, err := db.GetAllUsers(server.DataBase, server.UsersTableName, server.ReservationsTableName)
@@ -30,7 +33,7 @@ func RegisterUserCheck(server *Server, user *db.User) error {
 	}
 
 	if usernameExists {
-		return &db.Error{"Username already exists"}
+		return errors.New("Username already exists")
 	}
 
 	return nil
