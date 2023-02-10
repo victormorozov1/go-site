@@ -59,9 +59,9 @@ func (reservation Reservation) String() string {
 	return s
 }
 
-func (reservation *Reservation) LoadUser(db *sql.DB, usersTableName, reservationTableName string) error {
+func (reservation *Reservation) LoadUser(db *sql.DB, usersTableName string) error {
 	// Убрать цикличность
-	user, err := GetUserById(db, reservation.User_id, usersTableName, reservationTableName)
+	user, err := GetUserById(db, reservation.User_id, usersTableName)
 	if err != nil {
 		return err
 	}

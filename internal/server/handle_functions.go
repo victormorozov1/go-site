@@ -101,8 +101,7 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		println("In login")
 		name, password := r.FormValue("name"), r.FormValue("password")
-		dbUsers, err := database.GetUserBy(server.DataBase, "name", name,
-			server.UsersTableName, server.ReservationsTableName)
+		dbUsers, err := database.GetUserBy(server.DataBase, "name", name, server.UsersTableName)
 
 		if err != nil {
 			t.Execute(w, JoinData(
@@ -189,10 +188,8 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var users []*database.User
-	users, err = database.GetUserBy(server.DataBase, "id", strconv.Itoa(session.UserId),
-		server.UsersTableName, server.ReservationsTableName) // добавить функцию GetUserById
-	user := users[0]
+	var user *database.User
+	user, err = database.GetUserById(server.DataBase, session.UserId, server.UsersTableName)
 
 	err = user.LoadReservationsFromDB(server.DataBase, server.ReservationsTableName)
 	if err != nil {
@@ -244,7 +241,7 @@ func (server *Server) ReservationPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = reservation.LoadUser(server.DataBase, server.UsersTableName, server.ReservationsTableName)
+	err = reservation.LoadUser(server.DataBase, server.UsersTableName)
 	if err != nil {
 		println(err.Error())
 		t.Execute(w, JoinData(

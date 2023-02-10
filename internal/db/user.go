@@ -32,9 +32,9 @@ func (user *User) Check() error { // Можно сделать получше, �
 	return nil
 }
 
-func GetUsers(db *sql.DB, usersTableName, reservationsTableName, criteria string) ([]*User, error) {
+func GetUsers(db *sql.DB, usersTableName, criteria string) ([]*User, error) {
 	f := func(rows *sql.Rows) (*User, error) {
-		return ScanUserAndReservationsFromDBRows(rows, db, reservationsTableName)
+		return ScanUserFromDBRows(rows)
 	}
 	if criteria != "" {
 		criteria = " WHERE " + criteria
@@ -43,7 +43,7 @@ func GetUsers(db *sql.DB, usersTableName, reservationsTableName, criteria string
 }
 
 func GetAllUsers(db *sql.DB, usersTableName, reservationsTableName string) ([]*User, error) {
-	return GetUsers(db, usersTableName, reservationsTableName, "")
+	return GetUsers(db, usersTableName, "")
 }
 
 func (user *User) SaveToDB(db *sql.DB, usersTableName string) error {
@@ -93,17 +93,15 @@ func ScanUserAndReservationsFromDBRows(rows *sql.Rows, db *sql.DB, reservationsT
 		return nil, err
 	}
 
-	newUser.LoadReservationsFromDB(db, reservationsTableName)
-
 	return newUser, err
 }
 
-func GetUserBy(db *sql.DB, columnName, value, usersTableName, reservationsTableName string) ([]*User, error) {
-	return GetUsers(db, usersTableName, reservationsTableName, columnName+"='"+value+"'")
+func GetUserBy(db *sql.DB, columnName, value, usersTableName string) ([]*User, error) {
+	return GetUsers(db, usersTableName, columnName+"='"+value+"'")
 }
 
-func GetUserById(db *sql.DB, id int, usersTableName, reservationsTableName string) (*User, error) {
-	users, err := GetUserBy(db, "id", strconv.Itoa(id), usersTableName, reservationsTableName)
+func GetUserById(db *sql.DB, id int, usersTableName string) (*User, error) {
+	users, err := GetUserBy(db, "id", strconv.Itoa(id), usersTableName)
 	if err != nil {
 		return nil, err
 	}
