@@ -8,12 +8,6 @@ import (
 	"net/http"
 )
 
-type Routes struct {
-	MainPage                                           string
-	AllUsersPage, UserCabinet, RegisterPage, LoginPage string
-	TestPage                                           string
-}
-
 type Server struct {
 	Host                                  string
 	Port                                  int
@@ -25,8 +19,10 @@ type Server struct {
 	BaseTemplateData                      map[string]interface{}
 }
 
-func (server *Server) String() string {
-	return fmt.Sprintf("Server(%s:%d)", server.Host, server.Port)
+type Routes struct {
+	MainPage                                           string
+	AllUsersPage, UserCabinet, RegisterPage, LoginPage string
+	TestPage                                           string
 }
 
 func (server *Server) handleFunc() {
@@ -36,6 +32,10 @@ func (server *Server) handleFunc() {
 	http.HandleFunc(server.Routes.LoginPage, server.LogIn)
 	http.HandleFunc(server.Routes.UserCabinet, server.UserPage)
 	http.HandleFunc(server.Routes.TestPage, server.TestPage)
+}
+
+func (server *Server) String() string {
+	return fmt.Sprintf("Server(%s:%d)", server.Host, server.Port)
 }
 
 func (server *Server) Start() {

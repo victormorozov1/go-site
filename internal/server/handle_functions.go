@@ -193,14 +193,20 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 		server.UsersTableName, server.ReservationsTableName) // добавить функцию GetUserById
 	user := users[0]
 
+	err = user.LoadReservationsFromDB(server.DataBase, server.ReservationsTableName)
+	if err != nil {
+		print(err.Error())
+	}
+	
 	data := map[string]interface{}{
-		"Phone":      user.Phone,
-		"Email":      user.Email,
-		"PhotoSc":    user.Photo_src,
-		"Role":       user.Role,
-		"Patronymic": user.Patronymic,
-		"Name":       user.Name,
-		"Surname":    user.Surname,
+		"Phone":        user.Phone,
+		"Email":        user.Email,
+		"PhotoSrc":     user.Photo_src,
+		"Role":         user.Role,
+		"Patronymic":   user.Patronymic,
+		"Name":         user.Name,
+		"Surname":      user.Surname,
+		"Reservations": user.Reservations,
 	}
 	AddRoutesData(&data, server)
 

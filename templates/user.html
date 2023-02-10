@@ -6,10 +6,11 @@
     {{ template "include" }}
 </head>
 <body>
-{{ template "navbar" . }}
-{{ .Name }}
-{{ .Surname }}
-{{ .Role }}
-{{ .Phone }}
+<p>{{ template "navbar" . }}</p>
+<p>{{ .Name }} </p>
+<p>{{ .Surname }} </p>
+<p>{{ .Role }} </p>
+<p>{{ .Phone }} </p>
+<p>{{ .Reservations }} </p>
 </body>
 </html>
