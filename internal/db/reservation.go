@@ -61,11 +61,10 @@ func (reservation Reservation) String() string {
 
 func (reservation *Reservation) LoadUser(db *sql.DB, usersTableName, reservationTableName string) error {
 	// Убрать цикличность
-	userId := strconv.Itoa(reservation.User_id)
-	users, err := GetUserBy(db, "id", userId, usersTableName, reservationTableName)
+	user, err := GetUserById(db, reservation.User_id, usersTableName, reservationTableName)
 	if err != nil {
 		return err
 	}
-	reservation.User = users[0] // Создать функцию getUserById и ипользовать здесь ее
+	reservation.User = user // Создать функцию getUserById и ипользовать здесь ее
 	return nil
 }

@@ -101,3 +101,22 @@ func ScanUserAndReservationsFromDBRows(rows *sql.Rows, db *sql.DB, reservationsT
 func GetUserBy(db *sql.DB, columnName, value, usersTableName, reservationsTableName string) ([]*User, error) {
 	return GetUsers(db, usersTableName, reservationsTableName, columnName+"='"+value+"'")
 }
+
+func GetUserById(db *sql.DB, id int, usersTableName, reservationsTableName string) (*User, error) {
+	users, err := GetUserBy(db, "id", strconv.Itoa(id), usersTableName, reservationsTableName)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(users) == 0 {
+		return nil, &Error{"User not found"}
+	}
+
+	if len(users) == 0 {
+		err := Error{"many users with id=" + strconv.Itoa(id)}
+		panic(err.Error())
+		return nil, &err
+	}
+
+	return users[0], nil
+}
