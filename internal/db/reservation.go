@@ -21,19 +21,34 @@ func (reservation *Reservation) SaveToDB(db *sql.DB, reservationTableName string
 	})
 }
 
+func scanReservation(rows *sql.Rows) (*Reservation, error) {
+	var reservation = Reservation{}
+
+	err := rows.Scan(&reservation.Id, &reservation.User_id, &reservation.Table_id,
+		&reservation.Start_time, &reservation.End_time)
+
+	return &reservation, err
+}
+
 func GetReservationsByUserId(db *sql.DB, reservationTableName string, userId int) ([]*Reservation, error) {
-	f := func(rows *sql.Rows) (*Reservation, error) {
-		var reservation = Reservation{}
+	return getFromDB(db, "select * from "+reservationTableName+" where user_id="+strconv.Itoa(userId), scanReservation)
+}
 
-		err := rows.Scan(&reservation.Id, &reservation.User_id, &reservation.Table_id,
-			&reservation.Start_time, &reservation.End_time)
-
-		return &reservation, err
+func GetReservationById(db *sql.DB, reservationTableName string, id int) (*Reservation, error) {
+	reservations, err := getFromDB(db, "select * from "+reservationTableName+" where id="+strconv.Itoa(id), scanReservation)
+	if err != nil {
+		return nil, err
 	}
-	return getFromDB(db, "select * from "+reservationTableName+" where user_id="+strconv.Itoa(userId), f)
+	if len(reservations) == 0 {
+		return nil, &Error{"Reservation #" + strconv.Itoa(id) + " not found"}
+	}
+	if len(reservations) > 1 {
+		panic("many reservations with id = " + strconv.Itoa(id))
+	}
+	return reservations[0], nil
 }
 
 func (r Reservation) String() string {
-	return fmt.Sprintf("Reservation(id=%d user_id=%d table_id=%d start_time=%d end_time=%d",
+	return fmt.Sprintf("Reservation(id=%d user_id=%d table_id=%d start_time=%d end_time=%d)",
 		r.Id, r.User_id, r.Table_id, r.Start_time, r.End_time)
 }

@@ -3,6 +3,7 @@ package server
 import (
 	"database/sql"
 	"fmt"
+	"github.com/gorilla/mux"
 	"golang.org/x/exp/maps"
 	"math/rand"
 	"net/http"
@@ -23,6 +24,7 @@ type Routes struct {
 	MainPage                                           string
 	AllUsersPage, UserCabinet, RegisterPage, LoginPage string
 	TestPage                                           string
+	ReservationPage                                    string
 }
 
 func (server *Server) handleFunc() {
@@ -32,6 +34,11 @@ func (server *Server) handleFunc() {
 	http.HandleFunc(server.Routes.LoginPage, server.LogIn)
 	http.HandleFunc(server.Routes.UserCabinet, server.UserPage)
 	http.HandleFunc(server.Routes.TestPage, server.TestPage)
+
+	rtr := mux.NewRouter()
+	rtr.HandleFunc(server.Routes.ReservationPage+"/{id:[0-9]+}", server.ReservationPage).Methods("GET")
+
+	http.Handle("/", rtr)
 }
 
 func (server *Server) String() string {

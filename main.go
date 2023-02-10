@@ -40,12 +40,13 @@ func main() {
 		ReservationsTableName: "reservations2",
 		CookieName:            "data",
 		Routes: &server.Routes{
-			MainPage:     "/",
-			AllUsersPage: "/users",
-			UserCabinet:  "/me",
-			RegisterPage: "/register",
-			LoginPage:    "/login",
-			TestPage:     "/test",
+			MainPage:        "/main",
+			AllUsersPage:    "/users",
+			UserCabinet:     "/me",
+			RegisterPage:    "/register",
+			LoginPage:       "/login",
+			TestPage:        "/test",
+			ReservationPage: "/reservation",
 		},
 	}
 	baseTemplatesData := make(map[string]interface{}) // Это бы вынести в какой-то логичный метод создания сервера

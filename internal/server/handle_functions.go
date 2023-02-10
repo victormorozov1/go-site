@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"github.com/gorilla/mux"
 	"html/template"
 	database "internal/db"
 	"net/http"
@@ -197,7 +198,7 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		print(err.Error())
 	}
-	
+
 	data := map[string]interface{}{
 		"Phone":        user.Phone,
 		"Email":        user.Email,
@@ -220,4 +221,31 @@ func (server *Server) TestPage(w http.ResponseWriter, r *http.Request) {
 	}
 	println("returning in test", server.BaseTemplateData)
 	t.Execute(w, server.BaseTemplateData)
+}
+
+func (server *Server) ReservationPage(w http.ResponseWriter, r *http.Request) {
+	println("ReservationPage")
+	t, err := template.ParseFiles("templates/reservation.html", "templates/navbar.html", "templates/include.html")
+	if err != nil {
+		print(err)
+	}
+
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		print(err.Error())
+		t.Execute(w, JoinData(&map[string]interface{}{"Errors": []string{err.Error()}}, &server.BaseTemplateData))
+		return
+	}
+
+	reservation, err := database.GetReservationById(server.DataBase, server.ReservationsTableName, id)
+	if err != nil {
+		print(err.Error())
+		t.Execute(w, JoinData(&map[string]interface{}{"Error": err.Error()}, &server.BaseTemplateData))
+		return
+	}
+	println("here")
+	t.Execute(w, JoinData(
+		&map[string]interface{}{"Reservation": reservation},
+		&server.BaseTemplateData))
 }
