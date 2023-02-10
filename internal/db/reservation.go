@@ -9,6 +9,7 @@ import (
 type Reservation struct {
 	Id, Table_id, User_id int
 	Start_time, End_time  int // Потом сделать Time
+	User                  *User
 }
 
 func (reservation *Reservation) SaveToDB(db *sql.DB, reservationTableName string) error {
@@ -48,7 +49,23 @@ func GetReservationById(db *sql.DB, reservationTableName string, id int) (*Reser
 	return reservations[0], nil
 }
 
-func (r Reservation) String() string {
-	return fmt.Sprintf("Reservation(id=%d user_id=%d table_id=%d start_time=%d end_time=%d)",
-		r.Id, r.User_id, r.Table_id, r.Start_time, r.End_time)
+func (reservation Reservation) String() string {
+	s := fmt.Sprintf("Reservation(id=%d user_id=%d table_id=%d start_time=%d end_time=%d",
+		reservation.Id, reservation.User_id, reservation.Table_id, reservation.Start_time, reservation.End_time)
+	if reservation.User != nil {
+		s += ", " + reservation.User.String()
+	}
+	s += ")"
+	return s
+}
+
+func (reservation *Reservation) LoadUser(db *sql.DB, usersTableName, reservationTableName string) error {
+	// Убрать цикличность
+	userId := strconv.Itoa(reservation.User_id)
+	users, err := GetUserBy(db, "id", userId, usersTableName, reservationTableName)
+	if err != nil {
+		return err
+	}
+	reservation.User = users[0] // Создать функцию getUserById и ипользовать здесь ее
+	return nil
 }

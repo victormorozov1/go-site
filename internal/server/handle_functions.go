@@ -224,7 +224,6 @@ func (server *Server) TestPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) ReservationPage(w http.ResponseWriter, r *http.Request) {
-	println("ReservationPage")
 	t, err := template.ParseFiles("templates/reservation.html", "templates/navbar.html", "templates/include.html")
 	if err != nil {
 		print(err)
@@ -244,7 +243,16 @@ func (server *Server) ReservationPage(w http.ResponseWriter, r *http.Request) {
 		t.Execute(w, JoinData(&map[string]interface{}{"Error": err.Error()}, &server.BaseTemplateData))
 		return
 	}
-	println("here")
+
+	err = reservation.LoadUser(server.DataBase, server.UsersTableName, server.ReservationsTableName)
+	if err != nil {
+		println(err.Error())
+		t.Execute(w, JoinData(
+			&map[string]interface{}{"Errors": []string{err.Error()}},
+			&server.BaseTemplateData))
+		return
+	}
+
 	t.Execute(w, JoinData(
 		&map[string]interface{}{"Reservation": reservation},
 		&server.BaseTemplateData))
