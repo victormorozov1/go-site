@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gorilla/mux"
-	"golang.org/x/exp/maps"
 	"math/rand"
 	"net/http"
 )
@@ -72,15 +71,4 @@ func (server *Server) CreateSession() *Session {
 	}
 	server.Sessions[id] = &Session{Id: id}
 	return server.Sessions[id]
-}
-
-func AddRoutesData(data *map[string]interface{}, server *Server) {
-	(*data)["Routes"] = server.Routes
-}
-
-func JoinData(data1 *map[string]interface{}, data2 *map[string]interface{}) *map[string]interface{} { // Вынести куда-нибудь
-	resData := make(map[string]interface{})
-	maps.Copy(resData, *data1)
-	maps.Copy(resData, *data2)
-	return &resData
 }
