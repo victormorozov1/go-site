@@ -81,7 +81,7 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 			t.Execute(w, server.GetTemplateData(&map[string]interface{}{"Error": "Passwords don't match"}))
 		}
 	} else {
-		t.Execute(w, server.GetTemplateData(&map[string]interface{}{"Error": ""})) // Лучше даже везде делать Errors[]
+		t.Execute(w, server.GetTemplateData(&map[string]interface{}{"Error": ""}))
 	}
 }
 
@@ -224,7 +224,7 @@ func (server *Server) ReservationPage(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
 		print(err.Error())
-		t.Execute(w, server.GetTemplateData(&map[string]interface{}{"Errors": []string{err.Error()}}))
+		t.Execute(w, server.GetTemplateData(&map[string]interface{}{"Error": err.Error()}))
 		return
 	}
 
@@ -238,7 +238,7 @@ func (server *Server) ReservationPage(w http.ResponseWriter, r *http.Request) {
 	err = reservation.LoadUser(server.DataBase, server.UsersTableName)
 	if err != nil {
 		println(err.Error())
-		t.Execute(w, server.GetTemplateData(&map[string]interface{}{"Errors": []string{err.Error()}}))
+		t.Execute(w, server.GetTemplateData(&map[string]interface{}{"Error": err.Error()}))
 		return
 	}
 
