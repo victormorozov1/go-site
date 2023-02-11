@@ -49,9 +49,7 @@ func main() {
 			ReservationPage: "/reservation",
 		},
 	}
-	baseTemplatesData := make(map[string]interface{}) // Это бы вынести в какой-то логичный метод создания сервера
-	server.AddRoutesData(&baseTemplatesData, &s)
-	s.BaseTemplateData = baseTemplatesData
+	s.CountBaseTemplateData()
 
 	s.Start()
 	//db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")

@@ -16,7 +16,7 @@ type Server struct {
 	CookieName                            string
 	Sessions                              map[int]*Session
 	Routes                                *Routes
-	BaseTemplateData                      map[string]interface{}
+	BaseTemplateData                      *map[string]interface{}
 }
 
 type Routes struct {
