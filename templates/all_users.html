@@ -6,6 +6,7 @@
     {{ template "include" }}
 </head>
 <body>
+{{ . }}
     {{ template "navbar" . }}
     <p>В системе зарегестрировано: {{ .UsersNum }}</p>
     {{ range .UsersArr }}

@@ -9,7 +9,11 @@
     <div class="navbar-nav">
       <a class="nav-item nav-link" href="{{ .Routes.MainPage }}">Главная</a>
       <a class="nav-item nav-link" href="{{ .Routes.AllUsersPage }}">Все пользователи</a>
-      <a class="nav-item nav-link" href="{{ .Routes.LoginPage }}">Войти</a>
+      {{ if .Authorized }}
+        <a class="nav-item nav-link" href="{{ .Routes.LoginPage }}">Выйти</a>
+      {{ else }}
+        <a class="nav-item nav-link" href="{{ .Routes.LoginPage }}">Войти</a>
+      {{ end }}
       <a class="nav-item nav-link" href="{{ .Routes.RegisterPage }}">Регистрация</a>
       <a class="nav-item nav-link" href="{{ .Routes.UserCabinet }}">Личный кабинет</a>
 
