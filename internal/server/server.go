@@ -26,6 +26,11 @@ type Routes struct {
 	ReservationPage                                    string
 }
 
+func (routes Routes) String() string {
+	return fmt.Sprintf("Routes(MainPage: %s, AllUsersPage: %s, UserCabinet: %s, RegisterPage: %s, LoginPage: %s, TestPage: %s, ReservationPage: %s",
+		routes.MainPage, routes.AllUsersPage, routes.UserCabinet, routes.RegisterPage, routes.LoginPage, routes.TestPage, routes.ReservationPage)
+}
+
 func (server *Server) handleFunc() {
 	http.HandleFunc(server.Routes.MainPage, server.mainPage)
 	http.HandleFunc(server.Routes.AllUsersPage, server.allUsersPage)
