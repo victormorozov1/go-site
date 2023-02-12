@@ -55,7 +55,7 @@ func (server *Server) allUsersPage(w http.ResponseWriter, r *http.Request) {
 		"UsersNum": len(allUsers),
 		"UsersArr": allUsers,
 	}
-	t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{m}, r)) // Тут нельзя возвращать пароли
+	t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{m}, r))
 }
 
 func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
@@ -203,18 +203,7 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 		print(err.Error())
 	}
 
-	data := map[string]interface{}{
-		"Phone":        user.Phone,
-		"Email":        user.Email,
-		"PhotoSrc":     user.Photo_src,
-		"Role":         user.Role,
-		"Patronymic":   user.Patronymic,
-		"Name":         user.Name,
-		"Surname":      user.Surname,
-		"Reservations": user.Reservations,
-	}
-
-	t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{&data}, r))
+	t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{}, r))
 }
 
 func (server *Server) TestPage(w http.ResponseWriter, r *http.Request) {

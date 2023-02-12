@@ -54,7 +54,7 @@ func (user *User) SaveToDB(db *sql.DB, usersTableName string) error {
 }
 
 func (user *User) String() string {
-	return fmt.Sprintf("User(id=%d name=%v surname=%v patronymic=%v role=%v phone=%v email=%v photo_src=%v %d reservations",
+	return fmt.Sprintf("User(id=%d name=%v surname=%v patronymic=%v role=%v phone=%v email=%v photo_src=%v %d reservations)",
 		user.Id, user.Name, user.Surname, user.Patronymic, user.Role, user.Phone, user.Email, user.Photo_src, len(user.Reservations))
 }
 

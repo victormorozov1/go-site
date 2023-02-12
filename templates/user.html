@@ -7,10 +7,10 @@
 </head>
 <body>
 <p>{{ template "navbar" . }}</p>
-<p>{{ .Name }} </p>
-<p>{{ .Surname }} </p>
-<p>{{ .Role }} </p>
-<p>{{ .Phone }} </p>
-<p>{{ .Reservations }} </p>
+<p>{{ .AuthorizedUser.Name }} </p>
+<p>{{ .AuthorizedUser.Surname }} </p>
+<p>{{ .AuthorizedUser.Role }} </p>
+<p>{{ .AuthorizedUser.Phone }} </p>
+<p>{{ .AuthorizedUser.Reservations }} </p>
 </body>
 </html>
