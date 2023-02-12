@@ -67,7 +67,7 @@ func GetTemplateUserData(server *Server, r *http.Request) *map[string]interface{
 		println(err.Error())
 	}
 
-	return JoinData(&map[string]interface{}{"User": user}, UserAuthorizedData(true))
+	return JoinData(&map[string]interface{}{"AuthorizedUser": user}, UserAuthorizedData(true))
 }
 
 func (server *Server) GetTemplateAndUserData(dataToAdd []*map[string]interface{}, r *http.Request) *map[string]interface{} {
