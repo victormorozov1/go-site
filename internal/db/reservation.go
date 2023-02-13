@@ -66,6 +66,10 @@ func (reservation *Reservation) LoadUser(db *sql.DB, usersTableName string) erro
 	if err != nil {
 		return err
 	}
-	reservation.User = user // Создать функцию getUserById и ипользовать здесь ее
+	reservation.User = user
 	return nil
+}
+
+func (reservation *Reservation) Delete(db *sql.DB, reservationsTableName string) {
+	DeleteById(db, reservationsTableName, reservation.Id)
 }

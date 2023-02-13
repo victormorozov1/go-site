@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	database "internal/db"
+	db2 "internal/db"
 	"internal/server"
 )
 
@@ -32,7 +33,7 @@ func printReservationsByUser(db *sql.DB, userId int) {
 	}
 }
 
-func main() {
+func mainProgram() {
 	s := server.Server{
 		Host:                  "127.0.0.1",
 		Port:                  8080,
@@ -52,16 +53,18 @@ func main() {
 	s.CountBaseTemplateData()
 
 	s.Start()
-	//db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")
-	//
-	//if err != nil {
-	//	panic(err)
-	//}
-	//defer db.Close()
-	//
-	//u := database.User{8, "Shelly", "slava", "tadzicistanu", "Brawler",
-	//	"89124883837", "AMERICA@SOSYET.PUTINTOP228.ru", "/jkdfhjk", nil}
-	//u.SaveToDB(db)
-	//printAllUsers(db)
+}
 
+func main() {
+
+	db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")
+
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	r, err := db2.GetReservationById(db, "reservations2", 7)
+	print(r)
+	r.Delete(db, "reservations2")
 }
