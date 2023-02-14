@@ -1,0 +1,70 @@
+package server
+
+import (
+	"github.com/gorilla/mux"
+	"html/template"
+	database "internal/db"
+	"net/http"
+	"strconv"
+)
+
+func (server *Server) ReservationPage(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("templates/reservation.html", "templates/navbar.html", "templates/include.html")
+	if err != nil {
+		print(err)
+	}
+
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil {
+		print(err.Error())
+		t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": err.Error()}}, r))
+		return
+	}
+
+	reservation, err := database.GetReservationById(server.DataBase, server.ReservationsTableName, id)
+	if err != nil {
+		print(err.Error())
+		t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": err.Error()}}, r))
+		return
+	}
+
+	err = reservation.LoadUser(server.DataBase, server.UsersTableName)
+	if err != nil {
+		println(err.Error())
+		t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": err.Error()}}, r))
+		return
+	}
+
+	t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Reservation": reservation}}, r))
+}
+
+func (server *Server) DeleteReservationAjaxHandler(w http.ResponseWriter, r *http.Request) {
+	// Тут нужно по нормальному возвращать json а не строчки
+	errorFunc := func(err error) {
+		println(err.Error())
+		w.Write([]byte(err.Error()))
+	}
+
+	if r.Method == "POST" {
+		reservationId, err := strconv.Atoi(r.FormValue("id"))
+
+		if err != nil {
+			errorFunc(err)
+			return
+		}
+
+		println("Request to delete reservation #" + strconv.Itoa(reservationId))
+
+		reservation, err := database.GetReservationById(server.DataBase, server.ReservationsTableName, reservationId)
+
+		if err != nil {
+			errorFunc(err)
+			return
+		}
+
+		reservation.Delete(server.DataBase, server.ReservationsTableName) // ЛУчше сделать просто функцию deleteReservationById
+
+		w.Write([]byte("ok"))
+	}
+}

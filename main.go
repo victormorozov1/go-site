@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	_ "github.com/go-sql-driver/mysql"
 	database "internal/db"
-	db2 "internal/db"
 	"internal/server"
 )
 
@@ -33,7 +32,7 @@ func printReservationsByUser(db *sql.DB, userId int) {
 	}
 }
 
-func mainProgram() {
+func main() {
 	s := server.Server{
 		Host:                  "127.0.0.1",
 		Port:                  8080,
@@ -41,30 +40,17 @@ func mainProgram() {
 		ReservationsTableName: "reservations2",
 		CookieName:            "data",
 		Routes: &server.Routes{
-			MainPage:        "/main",
-			AllUsersPage:    "/users",
-			UserCabinet:     "/me",
-			RegisterPage:    "/register",
-			LoginPage:       "/login",
-			TestPage:        "/test",
-			ReservationPage: "/reservation",
+			MainPage:                     "/main",
+			AllUsersPage:                 "/users",
+			UserCabinet:                  "/me",
+			RegisterPage:                 "/register",
+			LoginPage:                    "/login",
+			TestPage:                     "/test",
+			ReservationPage:              "/reservation",
+			DeleteReservationAjaxHandler: "/delete_reservation",
 		},
 	}
 	s.CountBaseTemplateData()
 
 	s.Start()
-}
-
-func main() {
-
-	db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")
-
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
-
-	r, err := db2.GetReservationById(db, "reservations2", 7)
-	print(r)
-	r.Delete(db, "reservations2")
 }

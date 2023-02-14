@@ -4,10 +4,28 @@
     <meta charset="UTF-8">
     <title>Reservation  </title>
     {{ template "include" }}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 </head>
 <body>
 {{ template "navbar" . }}
  {{ .Reservation }}
+<button id="delete-reservation">Delete reservation</button>
+<p id="message"></p>
+<script>
+    function funkSuccess(data){
+        alert(data)
+    }
 
+    $(document).ready(function(){
+        $('#delete-reservation').click(function(){
+            $.ajax({
+                url: {{ .Routes.DeleteReservationAjaxHandler }},
+                method: "POST",
+                data: {id: {{ .Reservation.Id }}},
+                success: funkSuccess
+            });
+        });
+    });
+</script>
 </body>
 </html>
