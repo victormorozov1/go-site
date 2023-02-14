@@ -36,14 +36,20 @@ func (server *Server) ReservationPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Reservation": reservation}}, r))
+	err = t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Reservation": reservation}}, r))
+	if err != nil {
+		println(err.Error())
+	}
 }
 
 func (server *Server) DeleteReservationAjaxHandler(w http.ResponseWriter, r *http.Request) {
 	// Тут нужно по нормальному возвращать json а не строчки
 	errorFunc := func(err error) {
 		println(err.Error())
-		w.Write([]byte(err.Error()))
+		_, err = w.Write([]byte(err.Error()))
+		if err != nil {
+			println(err.Error())
+		}
 	}
 
 	if r.Method == "POST" {
@@ -65,6 +71,9 @@ func (server *Server) DeleteReservationAjaxHandler(w http.ResponseWriter, r *htt
 
 		reservation.Delete(server.DataBase, server.ReservationsTableName) // ЛУчше сделать просто функцию deleteReservationById
 
-		w.Write([]byte("ok"))
+		_, err = w.Write([]byte("ok"))
+		if err != nil {
+			println(err.Error())
+		}
 	}
 }

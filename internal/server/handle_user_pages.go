@@ -12,34 +12,39 @@ func (server *Server) allUsersPage(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/all_users.html", "templates/navbar.html", "templates/include.html")
 
 	if err != nil {
-		t.Execute(w, server.GetTemplateAndUserData(
+		println("Error: ", err.Error())
+		err = t.Execute(w, server.GetTemplateAndUserData(
 			[]*map[string]interface{}{
-				{"Error": err.Error()},
-			},
-			r,
-		),
-		)
+				{"Error": err.Error()}},
+			r))
+		if err != nil {
+			println(err.Error())
+		}
 		return
 	}
 
 	allUsers, err := database.GetAllUsers(server.DataBase, server.UsersTableName, server.ReservationsTableName)
 
 	if err != nil {
-		t.Execute(w, server.GetTemplateAndUserData(
-			[]*map[string]interface{}{
-				{"Error": err.Error()},
-			},
-			r,
-		),
-		)
 		println("Error: " + err.Error())
+		err = t.Execute(w, server.GetTemplateAndUserData(
+			[]*map[string]interface{}{
+				{"Error": err.Error()}},
+			r))
+		if err != nil {
+			println(err.Error())
+		}
 		return
 	}
+
 	m := &map[string]interface{}{
 		"UsersNum": len(allUsers),
 		"UsersArr": allUsers,
 	}
-	t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{m}, r))
+	err = t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{m}, r))
+	if err != nil {
+		println(err.Error())
+	}
 }
 
 func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +67,10 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 			err = RegisterUserCheck(server, &newUser)
 			if err != nil {
 				print(err)
-				t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": err.Error()}}, r))
+				err = t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": err.Error()}}, r))
+				if err != nil {
+					println(err)
+				}
 				return
 			}
 
@@ -74,10 +82,16 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 				http.Redirect(w, r, server.Routes.AllUsersPage, http.StatusSeeOther)
 			}
 		} else {
-			t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": "Passwords don't match"}}, r))
+			err = t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": "Passwords don't match"}}, r))
+			if err != nil {
+				println(err)
+			}
 		}
 	} else {
-		t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": ""}}, r))
+		err = t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": ""}}, r))
+		if err != nil {
+			print(err)
+		}
 	}
 }
 
@@ -95,19 +109,25 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 		dbUsers, err := database.GetUserBy(server.DataBase, "name", name, server.UsersTableName)
 
 		if err != nil {
-			t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": "Error on server"}}, r))
-			panic(err) // Хз что тут может быть, но можно как-то обработать
+			println(err)
+			err = t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": "Error on server"}}, r))
+			if err != nil {
+				println(err)
+			}
 			return
 		}
 
 		if len(dbUsers) == 0 {
-			t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": "User not found"}}, r))
 			println("Users with name " + name + " not found")
+			err = t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": "User not found"}}, r))
+			if err != nil {
+				println(err)
+			}
 			return
 		}
 
 		if len(dbUsers) > 1 {
-			panic("Error: found several users with name " + name) // тоже нудно вернуть ошибку пользователю
+			println("Error: found several users with name " + name) // тоже нудно вернуть ошибку пользователю
 		}
 
 		dbUser := dbUsers[0]
@@ -131,11 +151,17 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 			return
 		} else {
 			println("wrong password")
-			t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": "Wrong password"}}, r))
+			err = t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": "Wrong password"}}, r))
+			if err != nil {
+				println(err)
+			}
 			return
 		}
 	} else {
-		t.Execute(w, server.GetTemplateAndUserData(nil, r))
+		err = t.Execute(w, server.GetTemplateAndUserData(nil, r))
+		if err != nil {
+			println(err)
+		}
 		return
 	}
 }
@@ -155,16 +181,23 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 	var cookie *http.Cookie
 	cookie, err = r.Cookie(server.CookieName)
 	if err != nil {
-		t.Execute(w, err.Error())
-		// Вернуть ошибку
+		println(err) // Вернуть ошибку
+		err = t.Execute(w, err.Error())
+		if err != nil {
+			println(err)
+		}
 		return
 	}
 
 	var sessionId int
 	sessionId, err = strconv.Atoi(cookie.Value)
 	if err != nil {
-		t.Execute(w, err.Error())
+		println(err)
+		err = t.Execute(w, err.Error())
 		// Вернуть ошибку
+		if err != nil {
+			println(err)
+		}
 		return
 	}
 
@@ -187,5 +220,8 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 		print(err.Error())
 	}
 
-	t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{}, r))
+	err = t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{}, r))
+	if err != nil {
+		println(err)
+	}
 }

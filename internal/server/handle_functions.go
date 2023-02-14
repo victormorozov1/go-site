@@ -17,7 +17,10 @@ func (server *Server) mainPage(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, err.Error())
 	}
 
-	t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{}, r))
+	err = t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{}, r))
+	if err != nil {
+		println(err.Error())
+	}
 }
 
 func (server *Server) TestPage(w http.ResponseWriter, r *http.Request) {
@@ -26,5 +29,8 @@ func (server *Server) TestPage(w http.ResponseWriter, r *http.Request) {
 		print(err)
 	}
 	println("returning in test", server.BaseTemplateData)
-	t.Execute(w, server.BaseTemplateData)
+	err = t.Execute(w, server.BaseTemplateData)
+	if err != nil {
+		println(err.Error())
+	}
 }
