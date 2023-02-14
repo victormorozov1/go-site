@@ -181,11 +181,7 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 	var cookie *http.Cookie
 	cookie, err = r.Cookie(server.CookieName)
 	if err != nil {
-		println(err) // Вернуть ошибку
-		err = t.Execute(w, err.Error())
-		if err != nil {
-			println(err)
-		}
+		http.Redirect(w, r, server.Routes.LoginPage, http.StatusSeeOther)
 		return
 	}
 
@@ -207,8 +203,7 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 	)
 	session, ok = server.Sessions[sessionId]
 	if !ok {
-		println("Session#" + strconv.Itoa(sessionId) + "not found")
-		// Вернуть ошибку
+		http.Redirect(w, r, server.Routes.LoginPage, http.StatusSeeOther)
 		return
 	}
 
