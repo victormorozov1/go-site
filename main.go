@@ -32,7 +32,7 @@ func printReservationsByUser(db *sql.DB, userId int) {
 	}
 }
 
-func main() {
+func startServer() {
 	s := server.Server{
 		Host:                  "127.0.0.1",
 		Port:                  8080,
@@ -53,4 +53,39 @@ func main() {
 	s.CountBaseTemplateData()
 
 	s.Start()
+}
+
+func main() {
+	//table := database.Table{
+	//	Id:                 0,
+	//	Description:        "маленький стол",
+	//	TechnicalEquipment: "Лампа, унитаз",
+	//	X:                  180,
+	//	Y:                  18,
+	//	Hide:               false,
+	//	Users:              nil,
+	//	Reservations:       nil,
+	//}
+
+	db, err := sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	//err = table.SaveToDB(db, "tables")
+	//if err != nil {
+	//	println(err)
+	//}
+	table, err := database.GetTableById(db, "tables", 1)
+	if err != nil {
+		println(err)
+	}
+	err = table.LoadReservations(db, "reservations2")
+	if err != nil {
+		println(err)
+	}
+
+	println(table.String())
+
 }
