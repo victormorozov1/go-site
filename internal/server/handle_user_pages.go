@@ -8,7 +8,7 @@ import (
 	"time"
 )
 
-func (server *Server) allUsersPage(w http.ResponseWriter, r *http.Request) {
+func (server *Server) AllUsersPage(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/all_users.html", "templates/navbar.html", "templates/include.html")
 
 	if err != nil {

@@ -23,7 +23,7 @@ func (reservation *Reservation) SaveToDB(db *sql.DB, reservationTableName string
 	})
 }
 
-func scanReservation(rows *sql.Rows) (*Reservation, error) {
+func scanReservationFromDBRows(rows *sql.Rows) (*Reservation, error) {
 	var reservation = Reservation{}
 
 	err := rows.Scan(&reservation.Id, &reservation.User_id, &reservation.Table_id,
@@ -32,12 +32,23 @@ func scanReservation(rows *sql.Rows) (*Reservation, error) {
 	return &reservation, err
 }
 
+func GetReservations(db *sql.DB, reservationsTableName, criteria string) ([]*Reservation, error) {
+	if criteria != "" {
+		criteria = "WHERE " + criteria
+	}
+	return getFromDB(db, "select * from "+reservationsTableName+" "+criteria, scanReservationFromDBRows)
+}
+
+func GetReservationsBy(db *sql.DB, reservationsTableName, columnName, columnValue string) ([]*Reservation, error) {
+	return GetReservations(db, reservationsTableName, columnName+" = "+columnValue)
+}
+
 func GetReservationsByUserId(db *sql.DB, reservationTableName string, userId int) ([]*Reservation, error) {
-	return getFromDB(db, "select * from "+reservationTableName+" where user_id="+strconv.Itoa(userId), scanReservation)
+	return GetReservationsBy(db, reservationTableName, "user_id", strconv.Itoa(userId))
 }
 
 func GetReservationById(db *sql.DB, reservationTableName string, id int) (*Reservation, error) {
-	reservations, err := getFromDB(db, "select * from "+reservationTableName+" where id="+strconv.Itoa(id), scanReservation)
+	reservations, err := getFromDB(db, "select * from "+reservationTableName+" where id="+strconv.Itoa(id), scanReservationFromDBRows)
 	if err != nil {
 		return nil, err
 	}

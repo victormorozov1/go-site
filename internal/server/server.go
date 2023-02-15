@@ -33,7 +33,7 @@ func (routes Routes) String() string {
 
 func (server *Server) handleFunc() {
 	http.HandleFunc(server.Routes.MainPage, server.mainPage)
-	http.HandleFunc(server.Routes.AllUsersPage, server.allUsersPage)
+	http.HandleFunc(server.Routes.AllUsersPage, server.AllUsersPage)
 	http.HandleFunc(server.Routes.RegisterPage, server.Register)
 	http.HandleFunc(server.Routes.LoginPage, server.LogIn)
 	http.HandleFunc(server.Routes.UserCabinet, server.UserPage)
