@@ -86,3 +86,14 @@ func (reservation *Reservation) LoadUser(db *Database) error {
 func (reservation *Reservation) Delete(db *Database) {
 	DeleteById(db.Connection, db.Tables.Reservations.TableName, reservation.Id)
 }
+
+func ReservationOverlaps(r1, r2 *Reservation) bool {
+	if r1.Table_id != r2.Table_id {
+		return false
+	}
+
+	between := func(a, b, c int) bool {
+		return a >= b && a <= c
+	}
+	return between(r1.Start_time, r2.Start_time, r2.End_time) || between(r2.Start_time, r1.Start_time, r1.End_time)
+}
