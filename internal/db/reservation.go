@@ -39,6 +39,10 @@ func GetReservations(db *Database, criteria string) ([]*Reservation, error) {
 	return getFromDB(db.Connection, "select * from "+db.Tables.Reservations.TableName+" "+criteria, scanReservationFromDBRows)
 }
 
+func GetAllReservations(db *Database) ([]*Reservation, error) {
+	return GetReservations(db, "")
+}
+
 func GetReservationsBy(db *Database, columnName, columnValue string) ([]*Reservation, error) {
 	return GetReservations(db, columnName+" = "+columnValue)
 }
@@ -96,4 +100,28 @@ func ReservationOverlaps(r1, r2 *Reservation) bool {
 		return a >= b && a <= c
 	}
 	return between(r1.Start_time, r2.Start_time, r2.End_time) || between(r2.Start_time, r1.Start_time, r1.End_time)
+}
+
+func (reservation *Reservation) OverlapsOther(allReservations []*Reservation) (bool, int) {
+	for _, r := range allReservations {
+		if r.Id != reservation.Id {
+			if ReservationOverlaps(reservation, r) {
+				return true, r.Id
+			}
+		}
+	}
+	return false, -1
+}
+
+func (reservation *Reservation) Check(allReservations []*Reservation) error {
+	if reservation.Start_time >= reservation.End_time {
+		return errors.New("start_time >= end_time")
+	}
+
+	overlap, ind := reservation.OverlapsOther(allReservations)
+	if overlap {
+		return errors.New("Overlaps with reservation#" + strconv.Itoa(ind))
+	}
+
+	return nil
 }
