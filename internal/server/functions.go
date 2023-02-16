@@ -3,6 +3,8 @@ package server
 import (
 	"errors"
 	"internal/db"
+	"net/http"
+	"strconv"
 )
 
 func UsernameExists(server *Server, name string) (bool, error) {
@@ -37,4 +39,24 @@ func RegisterUserCheck(server *Server, user *db.User) error {
 	}
 
 	return nil
+}
+
+func GetUserId(server *Server, r *http.Request) (int, error) {
+	cookie, err := r.Cookie(server.CookieName)
+	if err != nil {
+		return -1, err
+	}
+
+	var sessionId int
+	sessionId, err = strconv.Atoi(cookie.Value)
+	if err != nil {
+		return -1, err
+	}
+
+	session, ok := server.Sessions[sessionId]
+	if !ok {
+		return -1, errors.New("session#" + strconv.Itoa(sessionId) + " not found")
+	}
+
+	return session.UserId, nil
 }

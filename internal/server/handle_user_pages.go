@@ -178,37 +178,15 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 
-	var cookie *http.Cookie
-	cookie, err = r.Cookie(server.CookieName)
-	if err != nil {
-		http.Redirect(w, r, server.Routes.LoginPage, http.StatusSeeOther)
-		return
-	}
-
-	var sessionId int
-	sessionId, err = strconv.Atoi(cookie.Value)
-	if err != nil {
-		println(err)
-		err = t.Execute(w, err.Error())
-		// Вернуть ошибку
-		if err != nil {
-			println(err)
-		}
-		return
-	}
-
-	var (
-		session *Session
-		ok      bool
-	)
-	session, ok = server.Sessions[sessionId]
-	if !ok {
+	userId, err := GetUserId(server, r)
+	if err != nil { // Вообще тут иогут быть разные ошибки в теории, но скорее всего просто не авторизванный пользователь
+		print(err)
 		http.Redirect(w, r, server.Routes.LoginPage, http.StatusSeeOther)
 		return
 	}
 
 	var user *database.User
-	user, err = database.GetUserById(&server.DataBase, session.UserId)
+	user, err = database.GetUserById(&server.DataBase, userId)
 
 	err = user.LoadReservationsFromDB(&server.DataBase)
 	if err != nil {
