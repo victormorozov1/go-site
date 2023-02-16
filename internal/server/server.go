@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"github.com/gorilla/mux"
+	"internal/db"
 	"math/rand"
 	"net/http"
 )
@@ -11,7 +12,7 @@ import (
 type Server struct {
 	Host                                  string
 	Port                                  int
-	DataBase                              *sql.DB
+	DataBase                              db.Database
 	UsersTableName, ReservationsTableName string
 	CookieName                            string
 	Sessions                              map[int]*Session
@@ -59,11 +60,11 @@ func (server *Server) Start() {
 	server.handleFunc()
 
 	var err error
-	server.DataBase, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")
+	server.DataBase.Connection, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")
 	if err != nil {
 		panic(err)
 	}
-	defer server.DataBase.Close()
+	defer server.DataBase.Connection.Close()
 
 	http.ListenAndServe(fmt.Sprintf(":%d", server.Port), nil)
 }

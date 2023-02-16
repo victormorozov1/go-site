@@ -25,31 +25,31 @@ func (user *User) Check() error { // Можно сделать получше, �
 	return nil
 }
 
-func GetUsers(db *sql.DB, usersTableName, criteria string) ([]*User, error) {
+func GetUsers(db *Database, criteria string) ([]*User, error) {
 	f := func(rows *sql.Rows) (*User, error) {
 		return ScanUserFromDBRows(rows)
 	}
 	if criteria != "" {
 		criteria = " WHERE " + criteria
 	}
-	return getFromDB(db, "select * from "+usersTableName+criteria, f)
+	return getFromDB(db.Connection, "select * from "+db.Tables.Users.TableName+criteria, f)
 }
 
-func GetAllUsers(db *sql.DB, usersTableName, reservationsTableName string) ([]*User, error) {
-	return GetUsers(db, usersTableName, "")
+func GetAllUsers(db *Database) ([]*User, error) {
+	return GetUsers(db, "")
 }
 
-func (user *User) SaveToDB(db *sql.DB, usersTableName string) error {
-	return SaveToDB(db, usersTableName, map[string]string{
-		"id":              strconv.Itoa(user.Id), //По идее если id=0 то его не нужно отправлять, но оно и так игнорируется почему-то
-		"name":            user.Name,
-		"surname":         user.Surname,
-		"patronymic":      user.Patronymic,
-		"role":            user.Role,
-		"phone":           user.Phone,
-		"email":           user.Email,
-		"photo_src":       user.Photo_src,
-		"hashed_password": user.HashedPassword,
+func (user *User) SaveToDB(db *Database) error {
+	return SaveToDB(db.Connection, db.Tables.Users.TableName, map[string]string{
+		db.Tables.Users.Id:             strconv.Itoa(user.Id), //По идее если id=0 то его не нужно отправлять, но оно и так игнорируется почему-то
+		db.Tables.Users.Name:           user.Name,
+		db.Tables.Users.Surname:        user.Surname,
+		db.Tables.Users.Patronymic:     user.Patronymic,
+		db.Tables.Users.Role:           user.Role,
+		db.Tables.Users.Phone:          user.Phone,
+		db.Tables.Users.Email:          user.Email,
+		db.Tables.Users.PhotoSrc:       user.Photo_src,
+		db.Tables.Users.HashedPassword: user.HashedPassword,
 	})
 }
 
@@ -58,8 +58,8 @@ func (user *User) String() string {
 		user.Id, user.Name, user.Surname, user.Patronymic, user.Role, user.Phone, user.Email, user.Photo_src, user.Reservations)
 }
 
-func (user *User) LoadReservationsFromDB(db *sql.DB, reservationsTableName string) error {
-	reservations, err := GetReservationsByUserId(db, reservationsTableName, user.Id)
+func (user *User) LoadReservationsFromDB(db *Database) error {
+	reservations, err := GetReservationsByUserId(db, user.Id)
 
 	if err != nil {
 		return err
@@ -79,7 +79,7 @@ func ScanUserFromDBRows(rows *sql.Rows) (*User, error) {
 	return &newUser, err
 }
 
-func ScanUserAndReservationsFromDBRows(rows *sql.Rows, db *sql.DB, reservationsTableName string) (*User, error) {
+func ScanUserAndReservationsFromDBRows(rows *sql.Rows) (*User, error) {
 	newUser, err := ScanUserFromDBRows(rows)
 
 	if err != nil {
@@ -89,12 +89,12 @@ func ScanUserAndReservationsFromDBRows(rows *sql.Rows, db *sql.DB, reservationsT
 	return newUser, err
 }
 
-func GetUserBy(db *sql.DB, columnName, value, usersTableName string) ([]*User, error) {
-	return GetUsers(db, usersTableName, columnName+"='"+value+"'")
+func GetUserBy(db *Database, columnName, value string) ([]*User, error) {
+	return GetUsers(db, columnName+"='"+value+"'")
 }
 
-func GetUserById(db *sql.DB, id int, usersTableName string) (*User, error) {
-	users, err := GetUserBy(db, "id", strconv.Itoa(id), usersTableName)
+func GetUserById(db *Database, id int) (*User, error) {
+	users, err := GetUserBy(db, "id", strconv.Itoa(id))
 	if err != nil {
 		return nil, err
 	}

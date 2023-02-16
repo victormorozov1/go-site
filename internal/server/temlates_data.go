@@ -54,7 +54,7 @@ func GetTemplateUserData(server *Server, r *http.Request) *map[string]interface{
 	}
 
 	userId := session.UserId
-	user, err := db.GetUserById(server.DataBase, userId, server.UsersTableName)
+	user, err := db.GetUserById(&server.DataBase, userId)
 	if err != nil {
 		return JoinData(&map[string]interface{}{
 			"Error": err.Error()},
@@ -62,7 +62,7 @@ func GetTemplateUserData(server *Server, r *http.Request) *map[string]interface{
 		)
 	}
 
-	err = user.LoadReservationsFromDB(server.DataBase, server.ReservationsTableName)
+	err = user.LoadReservationsFromDB(&server.DataBase)
 	if err != nil {
 		println(err.Error())
 	}

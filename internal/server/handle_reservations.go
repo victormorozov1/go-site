@@ -22,14 +22,14 @@ func (server *Server) ReservationPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	reservation, err := database.GetReservationById(server.DataBase, server.ReservationsTableName, id)
+	reservation, err := database.GetReservationById(&server.DataBase, id)
 	if err != nil {
 		print(err.Error())
 		t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": err.Error()}}, r))
 		return
 	}
 
-	err = reservation.LoadUser(server.DataBase, server.UsersTableName)
+	err = reservation.LoadUser(&server.DataBase)
 	if err != nil {
 		println(err.Error())
 		t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": err.Error()}}, r))
@@ -62,14 +62,14 @@ func (server *Server) DeleteReservationAjaxHandler(w http.ResponseWriter, r *htt
 
 		println("Request to delete reservation #" + strconv.Itoa(reservationId))
 
-		reservation, err := database.GetReservationById(server.DataBase, server.ReservationsTableName, reservationId)
+		reservation, err := database.GetReservationById(&server.DataBase, reservationId)
 
 		if err != nil {
 			errorFunc(err)
 			return
 		}
 
-		reservation.Delete(server.DataBase, server.ReservationsTableName) // ЛУчше сделать просто функцию deleteReservationById
+		reservation.Delete(&server.DataBase) // ЛУчше сделать просто функцию deleteReservationById
 
 		_, err = w.Write([]byte("ok"))
 		if err != nil {

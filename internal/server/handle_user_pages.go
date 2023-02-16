@@ -23,7 +23,7 @@ func (server *Server) AllUsersPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	allUsers, err := database.GetAllUsers(server.DataBase, server.UsersTableName, server.ReservationsTableName)
+	allUsers, err := database.GetAllUsers(&server.DataBase)
 
 	if err != nil {
 		println("Error: " + err.Error())
@@ -75,7 +75,7 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 			}
 
 			println(newUser.String())
-			err = newUser.SaveToDB(server.DataBase, server.UsersTableName)
+			err = newUser.SaveToDB(&server.DataBase)
 			if err != nil {
 				println(err)
 			} else {
@@ -106,7 +106,7 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
 		println("In login")
 		name, password := r.FormValue("name"), r.FormValue("password")
-		dbUsers, err := database.GetUserBy(server.DataBase, "name", name, server.UsersTableName)
+		dbUsers, err := database.GetUserBy(&server.DataBase, server.DataBase.Tables.Users.Name, name)
 
 		if err != nil {
 			println(err)
@@ -208,9 +208,9 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var user *database.User
-	user, err = database.GetUserById(server.DataBase, session.UserId, server.UsersTableName)
+	user, err = database.GetUserById(&server.DataBase, session.UserId)
 
-	err = user.LoadReservationsFromDB(server.DataBase, server.ReservationsTableName)
+	err = user.LoadReservationsFromDB(&server.DataBase)
 	if err != nil {
 		print(err.Error())
 	}

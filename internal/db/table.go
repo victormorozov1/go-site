@@ -21,13 +21,13 @@ func (table Table) String() string {
 		table.Id, table.Description, table.TechnicalEquipment, table.X, table.Y, table.Hide, table.Users, table.Reservations)
 }
 
-func (table *Table) SaveToDB(db *sql.DB, tableTableName string) error {
-	return SaveToDB(db, tableTableName, map[string]string{ // тут бы сделать interface{}
-		"id":                  strconv.Itoa(table.Id),
-		"description":         table.Description,
-		"technical_equipment": table.TechnicalEquipment,
-		"position":            XYPositionToText(table.X, table.Y),
-		"hide":                strconv.FormatBool(table.Hide),
+func (table *Table) SaveToDB(db *Database) error {
+	return SaveToDB(db.Connection, db.Tables.Tables.TableName, map[string]string{ // тут бы сделать interface{}
+		db.Tables.Tables.Id:                 strconv.Itoa(table.Id),
+		db.Tables.Tables.Description:        table.Description,
+		db.Tables.Tables.TechnicalEquipment: table.TechnicalEquipment,
+		db.Tables.Tables.Position:           XYPositionToText(table.X, table.Y),
+		db.Tables.Tables.Hide:               strconv.FormatBool(table.Hide),
 	})
 }
 
@@ -40,23 +40,23 @@ func scanTablesFromDBRows(rows *sql.Rows) (*Table, error) {
 	return &newTable, err
 }
 
-func GetTables(db *sql.DB, tablesTableName, criteria string) ([]*Table, error) {
+func GetTables(db *Database, criteria string) ([]*Table, error) {
 	if criteria != "" {
 		criteria = " WHERE " + criteria
 	}
-	return getFromDB(db, "select * from "+tablesTableName+criteria, scanTablesFromDBRows)
+	return getFromDB(db.Connection, "select * from "+db.Tables.Tables.TableName+criteria, scanTablesFromDBRows)
 }
 
-func GetAllTables(db *sql.DB, tablesTableName string) ([]*Table, error) {
-	return GetTables(db, tablesTableName, "")
+func GetAllTables(db *Database) ([]*Table, error) {
+	return GetTables(db, "")
 }
 
-func GetTablesBy(db *sql.DB, tablesTableName, columnName, columnValue string) ([]*Table, error) {
-	return GetTables(db, tablesTableName, columnName+" = "+columnValue)
+func GetTablesBy(db *Database, columnName, columnValue string) ([]*Table, error) {
+	return GetTables(db, columnName+" = "+columnValue)
 }
 
-func GetTableById(db *sql.DB, tablesTableName string, id int) (*Table, error) {
-	tables, err := GetTablesBy(db, tablesTableName, "id", strconv.Itoa(id))
+func GetTableById(db *Database, id int) (*Table, error) {
+	tables, err := GetTablesBy(db, "id", strconv.Itoa(id))
 	if err != nil {
 		return nil, err
 	}
@@ -72,8 +72,8 @@ func GetTableById(db *sql.DB, tablesTableName string, id int) (*Table, error) {
 	return tables[0], nil
 }
 
-func (table *Table) LoadReservations(db *sql.DB, reservationsTableName string) error {
-	reservations, err := GetReservationsBy(db, reservationsTableName, "table_id", strconv.Itoa((table.Id)))
+func (table *Table) LoadReservations(db *Database) error {
+	reservations, err := GetReservationsBy(db, "table_id", strconv.Itoa((table.Id)))
 	if err != nil {
 		return err
 	}

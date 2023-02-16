@@ -6,7 +6,7 @@ import (
 )
 
 func UsernameExists(server *Server, name string) (bool, error) {
-	allUsers, err := db.GetAllUsers(server.DataBase, server.UsersTableName, server.ReservationsTableName)
+	allUsers, err := db.GetAllUsers(&server.DataBase)
 	if err != nil {
 		return false, err
 	}

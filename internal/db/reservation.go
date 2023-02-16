@@ -13,13 +13,13 @@ type Reservation struct {
 	User                  *User
 }
 
-func (reservation *Reservation) SaveToDB(db *sql.DB, reservationTableName string) error {
-	return SaveToDB(db, reservationTableName, map[string]string{
-		"id":         strconv.Itoa(reservation.Id),
-		"table_id":   strconv.Itoa(reservation.Table_id),
-		"user_id":    strconv.Itoa(reservation.User_id),
-		"start_time": strconv.Itoa(reservation.Start_time),
-		"end_time":   strconv.Itoa(reservation.End_time),
+func (reservation *Reservation) SaveToDB(db *Database) error {
+	return SaveToDB(db.Connection, db.Tables.Reservations.TableName, map[string]string{
+		db.Tables.Reservations.Id:        strconv.Itoa(reservation.Id),
+		db.Tables.Reservations.TableId:   strconv.Itoa(reservation.Table_id),
+		db.Tables.Reservations.UserId:    strconv.Itoa(reservation.User_id),
+		db.Tables.Reservations.StartTime: strconv.Itoa(reservation.Start_time),
+		db.Tables.Reservations.EndTime:   strconv.Itoa(reservation.End_time),
 	})
 }
 
@@ -32,23 +32,25 @@ func scanReservationFromDBRows(rows *sql.Rows) (*Reservation, error) {
 	return &reservation, err
 }
 
-func GetReservations(db *sql.DB, reservationsTableName, criteria string) ([]*Reservation, error) {
+func GetReservations(db *Database, criteria string) ([]*Reservation, error) {
 	if criteria != "" {
 		criteria = "WHERE " + criteria
 	}
-	return getFromDB(db, "select * from "+reservationsTableName+" "+criteria, scanReservationFromDBRows)
+	return getFromDB(db.Connection, "select * from "+db.Tables.Reservations.TableName+" "+criteria, scanReservationFromDBRows)
 }
 
-func GetReservationsBy(db *sql.DB, reservationsTableName, columnName, columnValue string) ([]*Reservation, error) {
-	return GetReservations(db, reservationsTableName, columnName+" = "+columnValue)
+func GetReservationsBy(db *Database, columnName, columnValue string) ([]*Reservation, error) {
+	return GetReservations(db, columnName+" = "+columnValue)
 }
 
-func GetReservationsByUserId(db *sql.DB, reservationTableName string, userId int) ([]*Reservation, error) {
-	return GetReservationsBy(db, reservationTableName, "user_id", strconv.Itoa(userId))
+func GetReservationsByUserId(db *Database, userId int) ([]*Reservation, error) {
+	return GetReservationsBy(db, db.Tables.Reservations.UserId, strconv.Itoa(userId))
 }
 
-func GetReservationById(db *sql.DB, reservationTableName string, id int) (*Reservation, error) {
-	reservations, err := getFromDB(db, "select * from "+reservationTableName+" where id="+strconv.Itoa(id), scanReservationFromDBRows)
+func GetReservationById(db *Database, id int) (*Reservation, error) {
+	reservations, err := getFromDB(db.Connection, "select * from "+db.Tables.Reservations.TableName+
+		" where "+db.Tables.Reservations.Id+"="+strconv.Itoa(id),
+		scanReservationFromDBRows)
 	if err != nil {
 		return nil, err
 	}
@@ -71,9 +73,9 @@ func (reservation Reservation) String() string {
 	return s
 }
 
-func (reservation *Reservation) LoadUser(db *sql.DB, usersTableName string) error {
+func (reservation *Reservation) LoadUser(db *Database) error {
 	// Убрать цикличность
-	user, err := GetUserById(db, reservation.User_id, usersTableName)
+	user, err := GetUserById(db, reservation.User_id)
 	if err != nil {
 		return err
 	}
@@ -81,6 +83,6 @@ func (reservation *Reservation) LoadUser(db *sql.DB, usersTableName string) erro
 	return nil
 }
 
-func (reservation *Reservation) Delete(db *sql.DB, reservationsTableName string) {
-	DeleteById(db, reservationsTableName, reservation.Id)
+func (reservation *Reservation) Delete(db *Database) {
+	DeleteById(db.Connection, db.Tables.Reservations.TableName, reservation.Id)
 }
