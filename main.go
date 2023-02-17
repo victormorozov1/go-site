@@ -11,6 +11,10 @@ func startServer() {
 		Host:       "127.0.0.1",
 		Port:       8080,
 		CookieName: "data",
+		Roles: server.Roles{
+			Admin: "admin",
+			User:  "user",
+		},
 		Routes: &server.Routes{
 			MainPage:                     "/main",
 			AllUsersPage:                 "/users",

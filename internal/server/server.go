@@ -18,6 +18,7 @@ type Server struct {
 	Sessions                              map[int]*Session
 	Routes                                *Routes
 	BaseTemplateData                      *map[string]interface{}
+	Roles                                 Roles
 }
 
 type Routes struct {
@@ -25,6 +26,10 @@ type Routes struct {
 	AllUsersPage, UserCabinet, RegisterPage, LoginPage string
 	TestPage                                           string
 	ReservationPage, DeleteReservationAjaxHandler      string
+}
+
+type Roles struct {
+	User, Admin string
 }
 
 func (routes Routes) String() string {

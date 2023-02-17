@@ -1,6 +1,7 @@
 package server
 
 import (
+	"errors"
 	"github.com/gorilla/mux"
 	"html/template"
 	database "internal/db"
@@ -53,8 +54,13 @@ func (server *Server) DeleteReservationAjaxHandler(w http.ResponseWriter, r *htt
 	}
 
 	if r.Method == "POST" {
-		reservationId, err := strconv.Atoi(r.FormValue("id"))
+		userId, err := GetUserId(server, r)
+		if err != nil {
+			errorFunc(err)
+			return
+		}
 
+		reservationId, err := strconv.Atoi(r.FormValue("id"))
 		if err != nil {
 			errorFunc(err)
 			return
@@ -63,9 +69,18 @@ func (server *Server) DeleteReservationAjaxHandler(w http.ResponseWriter, r *htt
 		println("Request to delete reservation #" + strconv.Itoa(reservationId))
 
 		reservation, err := database.GetReservationById(&server.DataBase, reservationId)
-
 		if err != nil {
 			errorFunc(err)
+			return
+		}
+
+		user, err := database.GetUserById(&server.DataBase, userId)
+		if err != nil {
+			errorFunc(err)
+			return
+		}
+		if user.Id != reservation.User_id && user.Role != server.Roles.Admin {
+			errorFunc(errors.New("Недостаточно прав"))
 			return
 		}
 
