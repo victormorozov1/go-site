@@ -24,6 +24,7 @@ func startServer() {
 			TestPage:                     "/test",
 			ReservationPage:              "/reservation",
 			DeleteReservationAjaxHandler: "/delete_reservation",
+			MapPage:                      "/map",
 		},
 		DataBase: database.Database{
 			Name:     "go_site",

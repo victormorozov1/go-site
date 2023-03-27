@@ -26,6 +26,7 @@ type Routes struct {
 	AllUsersPage, UserCabinet, RegisterPage, LoginPage string
 	TestPage                                           string
 	ReservationPage, DeleteReservationAjaxHandler      string
+	MapPage                                            string
 }
 
 type Roles struct {
@@ -45,6 +46,7 @@ func (server *Server) handleFunc() {
 	http.HandleFunc(server.Routes.UserCabinet, server.UserPage)
 	http.HandleFunc(server.Routes.TestPage, server.TestPage)
 	http.HandleFunc(server.Routes.DeleteReservationAjaxHandler, server.DeleteReservationAjaxHandler)
+	http.HandleFunc(server.Routes.MapPage, server.MapPage)
 
 	rtr := mux.NewRouter()
 	rtr.HandleFunc(server.Routes.ReservationPage+"/{id:[0-9]+}", server.ReservationPage).Methods("GET")

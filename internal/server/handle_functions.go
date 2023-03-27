@@ -34,3 +34,15 @@ func (server *Server) TestPage(w http.ResponseWriter, r *http.Request) {
 		println(err.Error())
 	}
 }
+
+func (server *Server) MapPage(w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles("templates/map.html", "templates/navbar.html", "templates/include.html")
+	if err != nil {
+		print(err)
+	}
+	println("returning in map", server.BaseTemplateData)
+	err = t.Execute(w, server.BaseTemplateData)
+	if err != nil {
+		println(err.Error())
+	}
+}
