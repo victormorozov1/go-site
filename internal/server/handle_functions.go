@@ -5,13 +5,10 @@ import (
 	"github.com/gorilla/mux"
 	"html/template"
 	database "internal/db"
+
 	"net/http"
 	"strconv"
 )
-
-func Hash(s string) string {
-	return s + "типо хэширую" // Тут по нормальному хеширование сделать
-}
 
 func (server *Server) mainPage(w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles("templates/index.html", "templates/navbar.html", "templates/include.html")

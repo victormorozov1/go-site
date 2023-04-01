@@ -3,6 +3,7 @@ package server
 import (
 	"html/template"
 	database "internal/db"
+	"internal/functions"
 	"net/http"
 	"strconv"
 	"time"
@@ -61,7 +62,7 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 		if password == repeatPassword {
 			newUser := database.User{
 				Name:           name,
-				HashedPassword: Hash(password),
+				HashedPassword: functions.Hash(password),
 			}
 
 			err = RegisterUserCheck(server, &newUser)
@@ -132,7 +133,7 @@ func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {
 
 		dbUser := dbUsers[0]
 
-		if Hash(password) == dbUser.HashedPassword {
+		if functions.Hash(password) == dbUser.HashedPassword {
 			println(dbUser.Name + " logged in successfully")
 
 			session := server.CreateSession()
