@@ -32,7 +32,7 @@ func startServer() {
 			Driver:   "mysql",
 			Login:    "root",
 			Password: "",
-			Url:      "127.0.0.1:3306",
+			Url:      "127.0.0.1:8889",
 			Tables: database.Tables{
 				Users: database.UsersTable{
 					TableName:      "users",

@@ -11,6 +11,7 @@ type User struct {
 	Id                        int
 	Name, Surname, Patronymic string
 	Role                      string
+	JobTitle                  string
 	Phone, Email              string
 	Photo_src                 string
 	HashedPassword            string
@@ -46,6 +47,7 @@ func (user *User) SaveToDB(db *Database) error {
 		db.Tables.Users.Surname:        user.Surname,
 		db.Tables.Users.Patronymic:     user.Patronymic,
 		db.Tables.Users.Role:           user.Role,
+		db.Tables.Users.JobTile:        user.JobTitle,
 		db.Tables.Users.Phone:          user.Phone,
 		db.Tables.Users.Email:          user.Email,
 		db.Tables.Users.PhotoSrc:       user.Photo_src,
@@ -54,8 +56,8 @@ func (user *User) SaveToDB(db *Database) error {
 }
 
 func (user *User) String() string {
-	return fmt.Sprintf("User(Id=%d Name=%v Surname=%v Patronymic=%v Role=%v Phone=%v Email=%v Photo_src=%v Reservations=%v)",
-		user.Id, user.Name, user.Surname, user.Patronymic, user.Role, user.Phone, user.Email, user.Photo_src, user.Reservations)
+	return fmt.Sprintf("User(Id=%d Name=%v Surname=%v Patronymic=%v Role=%v JobTitle=%v Phone=%v Email=%v Photo_src=%v Reservations=%v)",
+		user.Id, user.Name, user.Surname, user.Patronymic, user.Role, user.JobTitle, user.Phone, user.Email, user.Photo_src, user.Reservations)
 }
 
 func (user *User) LoadReservationsFromDB(db *Database) error {
@@ -74,7 +76,7 @@ func ScanUserFromDBRows(rows *sql.Rows) (*User, error) {
 	var newUser = User{}
 
 	err := rows.Scan(&newUser.Id, &newUser.Name, &newUser.Surname, &newUser.Patronymic,
-		&newUser.Role, &newUser.Phone, &newUser.Email, &newUser.Photo_src, &newUser.HashedPassword)
+		&newUser.Role, &newUser.JobTitle, &newUser.Phone, &newUser.Email, &newUser.Photo_src, &newUser.HashedPassword)
 
 	return &newUser, err
 }

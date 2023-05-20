@@ -68,7 +68,7 @@ func (server *Server) Start() {
 	server.handleFunc()
 
 	var err error
-	server.DataBase.Connection, err = sql.Open("mysql", "root:@tcp(127.0.0.1:3306)/go_site")
+	server.DataBase.Connection, err = sql.Open("mysql", "root:root@tcp(127.0.0.1:8889)/go_site")
 	if err != nil {
 		panic(err)
 	}

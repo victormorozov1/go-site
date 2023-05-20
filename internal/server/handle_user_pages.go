@@ -171,7 +171,7 @@ func (server *Server) UserPage(w http.ResponseWriter, r *http.Request) {
 	var err error
 	var t *template.Template
 
-	t, err = template.ParseFiles("templates/user.html", "templates/navbar.html", "templates/include.html")
+	t, err = template.ParseFiles("templates/index.html", "templates/navbar.html", "templates/include.html")
 
 	defer func() { // Наверно это убрать лучше
 		if err != nil {
