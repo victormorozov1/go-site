@@ -41,6 +41,8 @@ func startServer() {
 					Surname:        "surname",
 					Patronymic:     "patronymic",
 					Role:           "role",
+					JobTile:        "JobTitle",
+					Department:     "Department",
 					Phone:          "phone",
 					Email:          "email",
 					PhotoSrc:       "photo_src",

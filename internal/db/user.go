@@ -12,6 +12,7 @@ type User struct {
 	Name, Surname, Patronymic string
 	Role                      string
 	JobTitle                  string
+	Department                string
 	Phone, Email              string
 	Photo_src                 string
 	HashedPassword            string
@@ -41,6 +42,7 @@ func GetAllUsers(db *Database) ([]*User, error) {
 }
 
 func (user *User) SaveToDB(db *Database) error {
+	fmt.Println(&user)
 	return SaveToDB(db.Connection, db.Tables.Users.TableName, map[string]string{
 		db.Tables.Users.Id:             strconv.Itoa(user.Id), //По идее если id=0 то его не нужно отправлять, но оно и так игнорируется почему-то
 		db.Tables.Users.Name:           user.Name,
@@ -48,6 +50,7 @@ func (user *User) SaveToDB(db *Database) error {
 		db.Tables.Users.Patronymic:     user.Patronymic,
 		db.Tables.Users.Role:           user.Role,
 		db.Tables.Users.JobTile:        user.JobTitle,
+		db.Tables.Users.Department:     user.Department,
 		db.Tables.Users.Phone:          user.Phone,
 		db.Tables.Users.Email:          user.Email,
 		db.Tables.Users.PhotoSrc:       user.Photo_src,
@@ -76,7 +79,7 @@ func ScanUserFromDBRows(rows *sql.Rows) (*User, error) {
 	var newUser = User{}
 
 	err := rows.Scan(&newUser.Id, &newUser.Name, &newUser.Surname, &newUser.Patronymic,
-		&newUser.Role, &newUser.JobTitle, &newUser.Phone, &newUser.Email, &newUser.Photo_src, &newUser.HashedPassword)
+		&newUser.Role, &newUser.JobTitle, &newUser.Department, &newUser.Phone, &newUser.Email, &newUser.Photo_src, &newUser.HashedPassword)
 
 	return &newUser, err
 }

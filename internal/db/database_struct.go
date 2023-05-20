@@ -32,6 +32,7 @@ type UsersTable struct {
 	Patronymic     string
 	Role           string
 	JobTile        string
+	Department     string
 	Phone          string
 	Email          string
 	PhotoSrc       string
