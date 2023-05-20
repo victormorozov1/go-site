@@ -59,8 +59,8 @@ func (user *User) SaveToDB(db *Database) error {
 }
 
 func (user *User) String() string {
-	return fmt.Sprintf("User(Id=%d Name=%v Surname=%v Patronymic=%v Role=%v JobTitle=%v Phone=%v Email=%v Photo_src=%v Reservations=%v)",
-		user.Id, user.Name, user.Surname, user.Patronymic, user.Role, user.JobTitle, user.Phone, user.Email, user.Photo_src, user.Reservations)
+	return fmt.Sprintf("User(Id=%d Name=%v Surname=%v Patronymic=%v Role=%v JobTitle=%v, Department=%v, Phone=%v Email=%v Photo_src=%v Reservations=%v)",
+		user.Id, user.Name, user.Surname, user.Patronymic, user.Role, user.JobTitle, user.Department, user.Phone, user.Email, user.Photo_src, user.Reservations)
 }
 
 func (user *User) LoadReservationsFromDB(db *Database) error {

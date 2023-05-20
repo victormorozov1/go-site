@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"golang.org/x/exp/maps"
 	"internal/db"
 	"net/http"
@@ -63,6 +64,17 @@ func GetTemplateUserData(server *Server, r *http.Request) *map[string]interface{
 	}
 
 	err = user.LoadReservationsFromDB(&server.DataBase)
+
+	if err != nil {
+		println(err.Error())
+	}
+	//загрузить инфу фором
+	for _, reservation := range user.Reservations {
+		err = reservation.LoadTable(&server.DataBase)
+		fmt.Println(reservation)
+
+	}
+
 	if err != nil {
 		println(err.Error())
 	}
