@@ -42,8 +42,11 @@ type UsersTable struct {
 type TablesTable struct {
 	TableName          string
 	Id                 string
+	Place              string
+	Floor              string
 	Description        string
 	TechnicalEquipment string
+	Internet           string
 	Position           string
 	Hide               string
 }

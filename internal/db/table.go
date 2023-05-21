@@ -9,7 +9,9 @@ import (
 
 type Table struct {
 	Id                              int
+	Place, Floor                    string
 	Description, TechnicalEquipment string
+	Internet                        string
 	X, Y                            int
 	Hide                            bool
 	Users                           []*User
@@ -17,15 +19,18 @@ type Table struct {
 }
 
 func (table Table) String() string {
-	return fmt.Sprintf("Table#%d(%s, %s, pos=(%d, %d), Hidden=%v, Users=%v, Reservations=%v",
-		table.Id, table.Description, table.TechnicalEquipment, table.X, table.Y, table.Hide, table.Users, table.Reservations)
+	return fmt.Sprintf("Table#%d(Place=%v Floor=%v Description=%s, TechnicalEquipment=%s, Internet=%s pos=(%d, %d), Hidden=%v, Users=%v, Reservations=%v",
+		table.Id, table.Place, table.Floor, table.Description, table.TechnicalEquipment, table.Internet, table.X, table.Y, table.Hide, table.Users, table.Reservations)
 }
 
 func (table *Table) SaveToDB(db *Database) error {
 	return SaveToDB(db.Connection, db.Tables.Tables.TableName, map[string]string{ // тут бы сделать interface{}
 		db.Tables.Tables.Id:                 strconv.Itoa(table.Id),
+		db.Tables.Tables.Place:              table.Place,
+		db.Tables.Tables.Floor:              table.Floor,
 		db.Tables.Tables.Description:        table.Description,
 		db.Tables.Tables.TechnicalEquipment: table.TechnicalEquipment,
+		db.Tables.Tables.Internet:           table.Internet,
 		db.Tables.Tables.Position:           XYPositionToText(table.X, table.Y),
 		db.Tables.Tables.Hide:               strconv.FormatBool(table.Hide),
 	})
@@ -34,7 +39,7 @@ func (table *Table) SaveToDB(db *Database) error {
 func scanTablesFromDBRows(rows *sql.Rows) (*Table, error) {
 	var newTable = Table{}
 	var textPosition string
-	err := rows.Scan(&newTable.Id, &newTable.Description, &newTable.TechnicalEquipment, &textPosition, newTable.Hide)
+	err := rows.Scan(&newTable.Id, &newTable.Place, &newTable.Floor, &newTable.Description, &newTable.TechnicalEquipment, &newTable.Internet, &textPosition, newTable.Hide)
 
 	newTable.X, newTable.Y, err = textPositionToXY(textPosition)
 	return &newTable, err

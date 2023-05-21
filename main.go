@@ -59,8 +59,11 @@ func startServer() {
 				Tables: database.TablesTable{
 					TableName:          "tables",
 					Id:                 "id",
+					Place:              "place",
+					Floor:              "floor",
 					Description:        "description",
 					TechnicalEquipment: "technical_equipment",
+					Internet:           "internet",
 					Position:           "position",
 					Hide:               "hide",
 				},
