@@ -309,10 +309,12 @@
 						</div>
 					</div>
 				</div>
-
+				{{if .AuthorizedUser.Reservations }}
 				<div class="reservation">
 					<div class="place">
-						21E
+						{{with index .AuthorizedUser.Reservations 0}}
+						{{.Table.Place}}
+						{{end}}
 					</div>
 					<div class="info">
 						<div class="date">
@@ -329,6 +331,7 @@
 						</div>
 					</div>
 				</div>
+				{{ end }}
 			</div>
 			<nav class="menu-bar">
 				<a href="#">Профиль</a>
@@ -385,12 +388,15 @@
 
 				</div>
 			</div>
+			{{ if .AuthorizedUser.Reservations }}
 			<div class="tile">
 				<div>
 					<h2>Текущее бронирование</h2>
 					<div class="current-reservation-info">
 						<div class="current-reservation-place">
-							21E
+							{{with index .AuthorizedUser.Reservations 0}}
+							{{.Table.Place}}
+							{{end}}
 						</div>
 						<div class="grid-content-3">
 							<div class="grid-content">
@@ -398,13 +404,17 @@
 									<div class="name-field">Место</div>
 								</div>
 								<div class="field">
-									21E
+									{{with index .AuthorizedUser.Reservations 0}}
+									{{.Table.Place}}
+									{{end}}
 								</div>
 								<div class="field">
 									<div class="name-field">Этаж</div>
 								</div>
 								<div class="field">
-									3
+									{{with index .AuthorizedUser.Reservations 0}}
+									{{.Table.Floor}}
+									{{end}}
 								</div>
 							</div>
 
@@ -429,13 +439,17 @@
 									<div class="name-field">Оборудование</div>
 								</div>
 								<div class="field">
-									iMac M2 Max
+									{{with index .AuthorizedUser.Reservations 0}}
+									{{.Table.TechnicalEquipment}}
+									{{end}}
 								</div>
 								<div class="field">
 									<div class="name-field">Интернет</div>
 								</div>
 								<div class="field">
-									Wi-Fi 1GBIT/s
+									{{with index .AuthorizedUser.Reservations 0}}
+									{{.Table.Internet}}
+									{{end}}
 								</div>
 							</div>
 						</div>
@@ -451,6 +465,14 @@
 						</div>
 				</div>
 			</div>
+		    {{ else }}
+			<div class="tile">
+				<div>
+					<h2>Текущее бронирование</h2>
+				</div>
+				Бронирований нет
+			</div>
+			{{ end }}
 
 		</div>
 	</div>
