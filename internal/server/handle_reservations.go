@@ -37,6 +37,13 @@ func (server *Server) ReservationPage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = reservation.LoadTable(&server.DataBase)
+	if err != nil {
+		println(err.Error())
+		t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Error": err.Error()}}, r))
+		return
+	}
+
 	err = t.Execute(w, server.GetTemplateAndUserData([]*map[string]interface{}{{"Reservation": reservation}}, r))
 	if err != nil {
 		println(err.Error())

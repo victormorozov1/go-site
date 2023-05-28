@@ -49,7 +49,7 @@ func (server *Server) AllUsersPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
-	t, err := template.ParseFiles("templates/register.html", "templates/navbar.html", "templates/include.html")
+	t, err := template.ParseFiles("templates/login.html", "templates/navbar.html", "templates/include.html")
 
 	if err != nil {
 		http.Redirect(w, r, server.Routes.MainPage, http.StatusSeeOther)
@@ -94,6 +94,19 @@ func (server *Server) Register(w http.ResponseWriter, r *http.Request) {
 			print(err)
 		}
 	}
+}
+
+func (server *Server) LogOut(w http.ResponseWriter, r *http.Request) {
+	c := &http.Cookie{
+		Name:     server.CookieName,
+		Value:    "",
+		Path:     "/",
+		MaxAge:   -1,
+		HttpOnly: true,
+	}
+	http.SetCookie(w, c)
+	http.Redirect(w, r, server.Routes.LoginPage, http.StatusSeeOther)
+	return
 }
 
 func (server *Server) LogIn(w http.ResponseWriter, r *http.Request) {

@@ -12,7 +12,6 @@ type Reservation struct {
 	Start_time, End_time  int // Потом сделать Time
 	User                  *User
 	Table                 *Table
-	//добавить поле стола
 }
 
 func (reservation *Reservation) SaveToDB(db *Database) error {
@@ -70,8 +69,8 @@ func GetReservationById(db *Database, id int) (*Reservation, error) {
 }
 
 func (reservation Reservation) String() string {
-	s := fmt.Sprintf("Reservation(id=%d user_id=%d table_id=%d start_time=%d end_time=%d table=%s",
-		reservation.Id, reservation.User_id, reservation.Table_id, reservation.Start_time, reservation.End_time, reservation.Table.String())
+	s := fmt.Sprintf("Reservation(id=%d user_id=%d table_id=%d start_time=%d end_time=%d",
+		reservation.Id, reservation.User_id, reservation.Table_id, reservation.Start_time, reservation.End_time)
 	if reservation.User != nil {
 		s += ", " + reservation.User.String()
 	}

@@ -8,7 +8,9 @@
 </head>
 <body>
 {{ template "navbar" . }}
- {{ .Reservation }}
+{{ .Reservation }}
+{{ .Reservation.User }}
+ {{ .Reservation.Table }}
 <button id="delete-reservation">Delete reservation</button>
 <p id="message"></p>
 <script>

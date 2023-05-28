@@ -11,7 +11,7 @@
       <a class="nav-item nav-link" href="{{ .Routes.MainPage }}">Главная</a>
       <a class="nav-item nav-link" href="{{ .Routes.AllUsersPage }}">Все пользователи</a>
       {{ if .Authorized }}
-        <a class="nav-item nav-link" href="{{ .Routes.LoginPage }}">Выйти</a>
+        <a class="nav-item nav-link" href="{{ .Routes.LogOutPage }}">Выйти</a>
       {{ else }}
         <a class="nav-item nav-link" href="{{ .Routes.LoginPage }}">Войти</a>
       {{ end }}
